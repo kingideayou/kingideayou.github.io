@@ -1,0 +1,939 @@
+<!doctype html>
+<html class="theme-next   use-motion ">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.4.5.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="雷达图," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.2" />
+
+
+
+
+
+
+<meta name="description" content="前言
+目前写到的项目在加载过程中需要用到像雷达扫描一样的效果，UI小哥（也就是美工）给了一百张各个时间的图片，要我用动画切换图片完成…我觉得作为个程序员，这种效果还是尽量用代码完成，所以就有了这篇博客。
+
+效果图
+分析
+根据上面的 Gif 可以看出，扫描时雷达的扫描范围为一个圆形，同时有个白色区域一直旋转。雷达搜索的小圆点是随机出现在扫描的圆形范围内的，小圆点的大小随机，透明度逐渐提高，并且出现在">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RadarView 雷达图">
+<meta property="og:url" content="http://kingideayou.github.io/2015/07/01/radar-view/index.html">
+<meta property="og:site_name" content="NeXT' Note">
+<meta property="og:description" content="前言
+目前写到的项目在加载过程中需要用到像雷达扫描一样的效果，UI小哥（也就是美工）给了一百张各个时间的图片，要我用动画切换图片完成…我觉得作为个程序员，这种效果还是尽量用代码完成，所以就有了这篇博客。
+
+效果图
+分析
+根据上面的 Gif 可以看出，扫描时雷达的扫描范围为一个圆形，同时有个白色区域一直旋转。雷达搜索的小圆点是随机出现在扫描的圆形范围内的，小圆点的大小随机，透明度逐渐提高，并且出现在">
+<meta property="og:image" content="https://raw.githubusercontent.com/kingideayou/RadarView/master/gif/radar_view_demo.gif">
+<meta property="og:updated_time" content="2015-07-03T16:01:43.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="RadarView 雷达图">
+<meta name="twitter:description" content="前言
+目前写到的项目在加载过程中需要用到像雷达扫描一样的效果，UI小哥（也就是美工）给了一百张各个时间的图片，要我用动画切换图片完成…我觉得作为个程序员，这种效果还是尽量用代码完成，所以就有了这篇博客。
+
+效果图
+分析
+根据上面的 Gif 可以看出，扫描时雷达的扫描范围为一个圆形，同时有个白色区域一直旋转。雷达搜索的小圆点是随机出现在扫描的圆形范围内的，小圆点的大小随机，透明度逐渐提高，并且出现在">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/kingideayou/RadarView/master/gif/radar_view_demo.gif">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: '',
+    sidebar: 'post',
+    motion: true
+  };
+</script>
+
+  <title> RadarView 雷达图 | NeXT' Note </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?de80a1008b1f6fb4125cb9f94992261a";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">NeXT' Note</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu ">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            Startseite
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            Archiv
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-th fa-fw"></i> <br />
+            
+            Kategorien
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-user fa-fw"></i> <br />
+            
+            Über
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                RadarView 雷达图
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            Veröffentlicht am
+            <time itemprop="dateCreated" datetime="2015-07-01T21:56:26+08:00" content="2015-07-01">
+              2015-07-01
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; in
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/CustomView/" itemprop="url" rel="index">
+                    <span itemprop="name">CustomView</span>
+                  </a>
+                </span>
+
+                
+                
+                  . 
+                
+
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/CustomView/自定义视图/" itemprop="url" rel="index">
+                    <span itemprop="name">自定义视图</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2015/07/01/radar-view/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/07/01/radar-view/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+
+          
+             <span id="/2015/07/01/radar-view/"class="leancloud_visitors"  data-flag-title="RadarView 雷达图">
+                &nbsp; | &nbsp; 阅读次数
+                </span>
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><blockquote>
+<p>目前写到的项目在加载过程中需要用到像雷达扫描一样的效果，UI小哥（也就是美工）给了一百张各个时间的图片，要我用动画切换图片完成…我觉得作为个程序员，这种效果还是尽量用代码完成，所以就有了这篇博客。</p>
+</blockquote>
+<h3 id="效果图"><a href="#效果图" class="headerlink" title="效果图"></a>效果图</h3><p><img src="https://raw.githubusercontent.com/kingideayou/RadarView/master/gif/radar_view_demo.gif" width="380" height="620" alt="效果图" align="center"></p>
+<h3 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h3><blockquote>
+<p>根据上面的 Gif 可以看出，扫描时雷达的扫描范围为一个圆形，同时有个白色区域一直旋转。雷达搜索的小圆点是随机出现在扫描的圆形范围内的，小圆点的大小随机，透明度逐渐提高，并且出现在雷达扫描线中白色区域扫描后的位置中。</p>
+<p>开始之前先要感谢<a href="http://blog.csdn.net/tianjian4592/article/details/45157787" target="_blank" rel="external">这篇博客</a>的帮助，在看本篇博客之前也可以先看下这篇博客了解下绘制的方法，当然，在下面我也会进行逐步解析……</p>
+</blockquote>
+<h3 id="核心代码"><a href="#核心代码" class="headerlink" title="核心代码"></a>核心代码</h3><p>首先根据前面分析的内容，定义小圆点类如下： <br></p>
+<pre><code>public class StarModel {  
+    public float sizePercent;
+    public int xLocation;
+    public int yLocation;
+    public float alpha;
+    public float twinkleRate;
+    public int currentLocation;
+
+    //此处省略 get set 方法
+    ......
+}
+</code></pre><p>其中 sizePercent 为缩放比例，xLocation、yLocation 为小圆点 x、y 坐标，alpha 为透明度，<br>twinkleRate 为透明度变化的速率。</p>
+<p>首先实现小圆点随机在不同位置出现，因为要在顶部半透明圆的白色区域刚刚扫描过的位置出现小圆点，我做了一个处理，把坐标分为四组，分别为：左上、左下、右上、右下。这样可以尽可能的控制小圆点在指定位置显示。</p>
+<pre><code>//左上角
+private static final float[][] STAR_LOCATION_LEFT_TOP = new float[][]{
+    {0.2f, 0.3f}, {0.22f, 0.361f}, {0.298f, 0.32f},{0.28f, 0.26f}};
+//右下角
+private static final float[][] STAR_LOCATION_RIGHT_DOWN = new float[][]{
+    {0.822f, 0.612f}, {0.722f, 0.76f}, {0.698f, 0.692f},{0.628f, 0.826f}};
+//右上角
+private static final float[][] STAR_LOCATION_RIGHT_TOP = new float[][]{
+    {0.612f, 0.3f}, {0.712f, 0.41f}, {0.32f, 0.598f},{0.26f, 0.789f}};
+//左下角
+private static final float[][] STAR_LOCATION_LEFT_DOWN = new float[][]{
+    {0.2f, 0.823f}, {0.22f, 0.6791f}, {0.298f, 0.62f},{0.28f, 0.826f}, {0.28f, 0.626f}};
+</code></pre><p>这里的实际上是把视图的宽高分别与上面的值相乘，得到对应坐标。</p>
+<p>随机大小通过 Radom 函数来实现，这里的透明度变化速率已经通过代码设置成了固定的值，绘制时通过改变 paint 的 alpha 可以对透明度进行控制</p>
+<pre><code>paint.setAlpha((int) (starAlpha * 255));
+</code></pre><p>最上层滚动的半透明圆是通过在线程中不断改变 Matrix 的角度使图片不断旋转，关键代码如下：</p>
+<pre><code>//开启线程，不断更新顶部半透明圆的角度
+new Thread(){
+        @Override
+        public void run() {
+            super.run();
+            while (true) {
+                synchronized (starModels) {
+                    angle = angle % 360;
+                    angle += 6;
+                    if (starModels != null &amp;&amp; starModels.size() &gt; 0) {
+                        for (int i = 0; i &lt; starModels.size(); i++) {
+                            resetStarFloat(starModels.get(i));
+                        }
+                        postInvalidate();
+                        try {
+                            Thread.sleep(30);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+        }
+    }.start();
+
+
+//根据旋转角度 angle 重新绘制最上层半透明圆
+matrix.setRotate(angle, mRadarWidth / 2, mRadarHeight / 2);
+canvas.drawBitmap(mRadar, matrix, null);
+</code></pre><p>绘制小圆点和顶部的原型图片的代码如下：</p>
+<pre><code>private void drawStarDynamic(int count, StarModel starModel, Canvas canvas, Paint paint) {
+
+    float starAlpha = starModel.getAlpha();
+    int xLocation = starModel.getxLocation();
+    int yLocation = starModel.getyLocation();
+    float sizePercent = starModel.getSizePercent();
+
+    xLocation = (int) (xLocation / sizePercent);
+    yLocation = (int) (yLocation / sizePercent);
+
+    if(xLocation == 0 || yLocation == 0) {
+        return;
+    }
+
+    Bitmap bitmap;
+    Rect srcRect;
+    Rect destRect = new Rect();
+
+    if (count % 3 == 0) {
+        bitmap = mStarOne;
+        srcRect = mStarOneSrcRect;
+        destRect.set(xLocation, yLocation,
+                xLocation + mStarOneWidth, yLocation
+                        + mStarOneHeight);
+    } else if (count % 2 == 0) {
+        bitmap = mStarThree;
+        srcRect = mStarThreeSrcRect;
+        destRect.set(xLocation, yLocation, xLocation
+                + mStarThreeWidth, yLocation + mStarThreeHeight);
+    } else {
+        bitmap = mStarTwo;
+        srcRect = mStarTwoSrcRect;
+        destRect.set(xLocation, yLocation, xLocation
+                + mStarTwoWidth, yLocation + mStarTwoHeight);
+    }
+
+    paint.setAlpha((int) (starAlpha * 255));
+    canvas.save();
+    canvas.scale(sizePercent, sizePercent);
+    canvas.drawBitmap(bitmap, srcRect, destRect, paint);
+    canvas.restore();
+
+}
+</code></pre><p>在这里说明下，小圆点需要在白色区域扫过时显示，这张顶部的圆形半透明图片的白线是在右侧水平位置的，根据图片的角度 angle ，可以大概获取到当前白色区域扫描到的位置，根据当前白色区域的位置，更新小圆点的位置就可以基本实现这样的效果了。</p>
+<h3 id="最后，项目-Github-地址-，欢迎-Star"><a href="#最后，项目-Github-地址-，欢迎-Star" class="headerlink" title="最后，项目 Github 地址 ，欢迎 Star ^-^"></a>最后，<a href="https://github.com/kingideayou/RadarView" target="_blank" rel="external">项目 Github 地址</a> ，欢迎 Star ^-^</h3></span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/雷达图/" rel="tag">#雷达图</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2015/07/03/tab_header_badge/" rel="prev" title="打造自己的 PagerSlidingTabStrip 之一 （给 Tab 添加红点）">
+                打造自己的 PagerSlidingTabStrip 之一 （给 Tab 添加红点） <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <div class="ds-share flat" data-thread-key="2015/07/01/radar-view/"
+     data-title="RadarView 雷达图"
+     data-content=""
+     data-url="http://kingideayou.github.io/2015/07/01/radar-view/">
+  <div class="ds-share-inline">
+    <ul  class="ds-share-icons-16">
+
+      <li data-toggle="ds-share-icons-more"><a class="ds-more" href="javascript:void(0);">分享到：</a></li>
+      <li><a class="ds-weibo" href="javascript:void(0);" data-service="weibo">微博</a></li>
+      <li><a class="ds-qzone" href="javascript:void(0);" data-service="qzone">QQ空间</a></li>
+      <li><a class="ds-qqt" href="javascript:void(0);" data-service="qqt">腾讯微博</a></li>
+      <li><a class="ds-wechat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+
+    </ul>
+    <div class="ds-share-icons-more">
+    </div>
+  </div>
+</div>
+      
+    </div>
+  </div>
+
+
+        </div>
+
+        
+
+
+        
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2015/07/01/radar-view/"
+           data-title="RadarView 雷达图" data-url="http://kingideayou.github.io/2015/07/01/radar-view/">
+      </div>
+    
+  </div>
+
+
+      </div>
+
+      
+        
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Inhaltsverzeichnis
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Übersicht
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="/images/default_avatar.jpg" alt="NeXT" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">NeXT</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description"></p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">23</span>
+              <span class="site-state-item-name">Artikel</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">29</span>
+              <span class="site-state-item-name">Kategorien</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">30</span>
+              <span class="site-state-item-name">Tags</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#效果图"><span class="nav-number">2.</span> <span class="nav-text">效果图</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#分析"><span class="nav-number">3.</span> <span class="nav-text">分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#核心代码"><span class="nav-number">4.</span> <span class="nav-text">核心代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#最后，项目-Github-地址-，欢迎-Star"><span class="nav-number">5.</span> <span class="nav-text">最后，项目 Github 地址 ，欢迎 Star ^-^</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+      
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">NeXT</span>
+</div>
+
+<div class="powered-by">
+  Erstellt mit  <a class="theme-link" href="http://hexo.io">Hexo</a>
+</div>
+
+<div class="theme-info">
+  Theme -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT
+  </a>
+</div>
+
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+    
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"nblog"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+    
+     
+
+
+    
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.2"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.2"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+<script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+<script type="text/javascript" src="/js/motion.js?v=0.4.5.2" id="motion.global"></script>
+
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.2" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    motionMiddleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+      if (CONFIG.sidebar === 'post') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  <script type="text/javascript" src="/js/bootstrap.js"></script>
+
+  
+  
+
+  
+  
+
+  
+     <!-- custom analytics part create by xiamo -->
+<script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+<script>AV.initialize("Bfw8DjNmL4FLoxqoz3vUlLGd-gzGzoHsz", "33hHJV3K3Am3vhOw5AghkoOG");</script>
+<script>
+function showTime(Counter) {
+	var query = new AV.Query(Counter);
+	$(".leancloud_visitors").each(function() {
+		var url = $(this).attr("id").trim();
+		query.equalTo("url", url);
+		query.find({
+			success: function(results) {
+				if (results.length == 0) {
+					var content = $(document.getElementById(url)).text() + ': 0';
+					$(document.getElementById(url)).text(content);
+					return;
+				}
+				for (var i = 0; i < results.length; i++) {
+					var object = results[i];
+					var content = $(document.getElementById(url)).text() + ': ' + object.get('time');
+					$(document.getElementById(url)).text(content);
+				}
+			},
+			error: function(object, error) {
+				console.log("Error: " + error.code + " " + error.message);
+			}
+		});
+
+	});
+}
+
+function addCount(Counter) {
+	var Counter = AV.Object.extend("Counter");
+	url = $(".leancloud_visitors").attr('id').trim();
+	title = $(".leancloud_visitors").attr('data-flag-title').trim();
+	var query = new AV.Query(Counter);
+	query.equalTo("url", url);
+	query.find({
+		success: function(results) {
+			if (results.length > 0) {
+				var counter = results[0];
+				counter.fetchWhenSave(true);
+				counter.increment("time");
+				counter.save(null, {
+					success: function(counter) {
+						var content = $(document.getElementById(url)).text() + ': ' + counter.get('time');
+						$(document.getElementById(url)).text(content);
+					},
+					error: function(counter, error) {
+						console.log('Failed to save Visitor num, with error message: ' + error.message);
+					}
+				});
+			} else {
+				var newcounter = new Counter();
+				newcounter.set("title", title);
+				newcounter.set("url", url);
+				newcounter.set("time", 1);
+				newcounter.save(null, {
+					success: function(newcounter) {
+					    console.log("newcounter.get('time')="+newcounter.get('time'));
+						var content = $(document.getElementById(url)).text() + ': ' + newcounter.get('time');
+						$(document.getElementById(url)).text(content);
+					},
+					error: function(newcounter, error) {
+						console.log('Failed to create');
+					}
+				});
+			}
+		},
+		error: function(error) {
+			console.log('Error:' + error.code + " " + error.message);
+		}
+	});
+}
+$(function() {
+	var Counter = AV.Object.extend("Counter");
+	if ($('.leancloud_visitors').length == 1) {
+		addCount(Counter);
+	} else if ($('.post-title-link').length > 1) {
+		showTime(Counter);
+	}
+}); 
+</script>
+
+  
+
+</body>
+</html>

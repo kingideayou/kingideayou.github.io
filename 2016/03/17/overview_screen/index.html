@@ -1,0 +1,914 @@
+<!doctype html>
+<html class="theme-next   use-motion ">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.4.5.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Overview,Lollipop," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.2" />
+
+
+
+
+
+
+<meta name="description" content="你在寻找在 Lolipop 上优化总览画面的方法吗？大多数开发者的选择是阅读官方文档  
+如文档所述：
+总览画面（返回最近的屏幕，最近的任务(task)列表，或者最近的应用程序）是用来给最近的 Activities 和 tasks 提供入口的系统级 UI. 用户可以从这个列表中选择一个 task 并恢复它，当然用户也可以通过滑动来移除这个任务。
+在 Lollipop 之前，总览画面是不可设置的。它">
+<meta property="og:type" content="article">
+<meta property="og:title" content="「译」Android 总览画面（Overview Screen）详解">
+<meta property="og:url" content="http://kingideayou.github.io/2016/03/17/overview_screen/index.html">
+<meta property="og:site_name" content="NeXT' Note">
+<meta property="og:description" content="你在寻找在 Lolipop 上优化总览画面的方法吗？大多数开发者的选择是阅读官方文档  
+如文档所述：
+总览画面（返回最近的屏幕，最近的任务(task)列表，或者最近的应用程序）是用来给最近的 Activities 和 tasks 提供入口的系统级 UI. 用户可以从这个列表中选择一个 task 并恢复它，当然用户也可以通过滑动来移除这个任务。
+在 Lollipop 之前，总览画面是不可设置的。它">
+<meta property="og:image" content="http://ww3.sinaimg.cn/mw690/6db4aff6jw1f1zqp3tf60j20go0cyjsz.jpg">
+<meta property="og:image" content="http://ww3.sinaimg.cn/mw690/6db4aff6jw1f1zqtkzduyj20go0irjsc.jpg">
+<meta property="og:image" content="http://ww4.sinaimg.cn/mw690/6db4aff6jw1f1zvm96b9ej20go08r75m.jpg">
+<meta property="og:image" content="http://ww4.sinaimg.cn/mw690/6db4aff6jw1f1zxnbks5qj20go08rgmv.jpg">
+<meta property="og:updated_time" content="2016-03-18T08:27:20.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="「译」Android 总览画面（Overview Screen）详解">
+<meta name="twitter:description" content="你在寻找在 Lolipop 上优化总览画面的方法吗？大多数开发者的选择是阅读官方文档  
+如文档所述：
+总览画面（返回最近的屏幕，最近的任务(task)列表，或者最近的应用程序）是用来给最近的 Activities 和 tasks 提供入口的系统级 UI. 用户可以从这个列表中选择一个 task 并恢复它，当然用户也可以通过滑动来移除这个任务。
+在 Lollipop 之前，总览画面是不可设置的。它">
+<meta name="twitter:image" content="http://ww3.sinaimg.cn/mw690/6db4aff6jw1f1zqp3tf60j20go0cyjsz.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: '',
+    sidebar: 'post',
+    motion: true
+  };
+</script>
+
+  <title> 「译」Android 总览画面（Overview Screen）详解 | NeXT' Note </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?de80a1008b1f6fb4125cb9f94992261a";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">NeXT' Note</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu ">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            Startseite
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            Archiv
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-th fa-fw"></i> <br />
+            
+            Kategorien
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-user fa-fw"></i> <br />
+            
+            Über
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                「译」Android 总览画面（Overview Screen）详解
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            Veröffentlicht am
+            <time itemprop="dateCreated" datetime="2016-03-17T16:26:00+08:00" content="2016-03-17">
+              2016-03-17
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; in
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Overview/" itemprop="url" rel="index">
+                    <span itemprop="name">Overview</span>
+                  </a>
+                </span>
+
+                
+                
+                  . 
+                
+
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Overview/Lollipop/" itemprop="url" rel="index">
+                    <span itemprop="name">Lollipop</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/03/17/overview_screen/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/03/17/overview_screen/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+
+          
+             <span id="/2016/03/17/overview_screen/"class="leancloud_visitors"  data-flag-title="「译」Android 总览画面（Overview Screen）详解">
+                &nbsp; | &nbsp; 阅读次数
+                </span>
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><p>你在寻找在 Lolipop 上优化总览画面的方法吗？大多数开发者的选择是阅读<a href="https://developer.android.com/intl/es/guide/components/recents.html" target="_blank" rel="external">官方文档</a>  </p>
+<p>如文档所述：</p>
+<pre><code>总览画面（返回最近的屏幕，最近的任务(task)列表，或者最近的应用程序）是用来给最近的 Activities 和 tasks 提供入口的系统级 UI. 用户可以从这个列表中选择一个 task 并恢复它，当然用户也可以通过滑动来移除这个任务。
+</code></pre><p>在 Lollipop 之前，总览画面是不可设置的。它所显示的内容包含应用程序的标签（label），launcher icon，还有用户在应用程序中最后操作的页面的截图。</p>
+<p><img src="http://ww3.sinaimg.cn/mw690/6db4aff6jw1f1zqp3tf60j20go0cyjsz.jpg" alt="">  </p>
+<p>从 Lollipop 起，我们有了更精致的总览画面。更重要的是，新的 API 可以让我们自定义总览画面”卡片”的 icon，title 和 顶部栏（top bar）的颜色。</p>
+<p><img src="http://ww3.sinaimg.cn/mw690/6db4aff6jw1f1zqtkzduyj20go0irjsc.jpg" alt="">  </p>
+<p>通过简单的设置，你就可以让你程序纵览画面卡片在众多应用中脱颖而出。  </p>
+<h3 id="默认的总览画面（Overview-Card）样式和-XML"><a href="#默认的总览画面（Overview-Card）样式和-XML" class="headerlink" title="默认的总览画面（Overview Card）样式和 XML"></a>默认的总览画面（Overview Card）样式和 XML</h3><p>让我们先了解下，如果你使用默认的 Lollipop 样式时将会发生什么。  </p>
+<p>系统将会根据程序的 manifest 给总览画面卡片的图标（icon），标签（label）和顶部栏（top bar）。  </p>
+<ul>
+<li>Icon - android:icon</li>
+<li>Label text - android:label</li>
+<li>Top Bar Color - colorPrimary value of android:theme</li>
+</ul>
+<p>这些参数值会从 Manifest 文件的 base activity 中读取。在大多数情况下，总览画面是基于应用程序的 launcher 或 main activity 来显示内容。如果当前的 Activity 中没有定义指定的参数，系统将会使用 application 的参数。  </p>
+<p>有趣的事情是，标签（lable）文字的颜色是不能直接设置的。系统会根据顶部栏的颜色自动设置标签文字的颜色。如果顶部栏是暗色，标签文字将为白色。否则，标签文字颜色将为黑色。  </p>
+<h4 id="向下兼容和-colorPrimary"><a href="#向下兼容和-colorPrimary" class="headerlink" title="向下兼容和 colorPrimary"></a>向下兼容和 colorPrimary</h4><p>从 Lollipop 才开始引入 colorPrimary 参数。然而，我们可以通过<a href="http://developer.android.com/intl/es/tools/support-library/features.html#v7-appcompat" target="_blank" rel="external">v7 appcompat</a> 设置这个参数。同时请确保你应用的主题为<a href="http://android-developers.blogspot.hk/2014/10/appcompat-v21-material-design-for-pre.html" target="_blank" rel="external">Lollipop-compatible</a>.更简单的方式就是 include v7 appcompat 资源库同时让主题继承自 AppCompat. 比如 Theme.AppCompat.Light.  </p>
+<h3 id="默认样式：使用-XML-的限制"><a href="#默认样式：使用-XML-的限制" class="headerlink" title="默认样式：使用 XML 的限制"></a>默认样式：使用 XML 的限制</h3><p>在什么情况下默认的样式就不够好了呢？这取决于你程序的设计。  </p>
+<p>更改总览画面最简单粗暴的方法，就是提供一个尺寸较小并且背景色跟 primaryColor 相同的，单独的总览图标（overview icon）。遗憾的是，通过 XML 文件并不能达到这样的效果。  </p>
+<p>Demo 程序获取：<a href="https://github.com/kristinmars/LollipopOverviewStylingDemo" target="_blank" rel="external">LollipopOverviewStylingDemo</a>  </p>
+<p><img src="http://ww4.sinaimg.cn/mw690/6db4aff6jw1f1zvm96b9ej20go08r75m.jpg" alt="">  </p>
+<p><em>AndroidManifest.xml</em> 文件的代码片段：  </p>
+<pre><code>...
+&lt;application
+    android:allowBackup=&quot;true&quot;
+    android:icon=&quot;@drawable/ic_launcher_bnr&quot;
+    android:label=&quot;@string/app_name&quot;
+    android:theme=&quot;@style/AppTheme&quot; &gt;
+
+    &lt;activity
+        android:name=&quot;com.bignerdranch.android.bignerdranch.WelcomeActivity&quot;
+        android:label=&quot;@string/app_name&quot;&gt;
+        &lt;intent-filter&gt;
+            &lt;action android:name=&quot;android.intent.action.MAIN&quot; /&gt;
+            &lt;category android:name=&quot;android.intent.category.LAUNCHER&quot; /&gt;
+        &lt;/intent-filter&gt;
+    &lt;/activity&gt;
+...  
+</code></pre><p><em>sytles.xml</em> 文件代码：  </p>
+<pre><code>&lt;resources&gt;
+    &lt;style name=&quot;AppTheme&quot; parent=&quot;@style/Theme.AppCompat.Light.DarkActionBar&quot;&gt;
+        &lt;item name=&quot;colorPrimary&quot;&gt;#747501&lt;/item&gt;
+        &lt;item name=&quot;colorPrimaryDark&quot;&gt;#595a02&lt;/item&gt;
+        &lt;item name=&quot;colorAccent&quot;&gt;#e7ad10&lt;/item&gt;
+    &lt;/style&gt;
+&lt;/resources&gt;  
+</code></pre><p>如果你运行了程序你可以看到，总览画面的 icon 根据 applicaation android:icon 显示，标签(label）根据 WelcomeActivity 的 android:label 显示，top bar 的颜色根据 AppTheme 的 colorPrimary 显示。  </p>
+<p><a href="https://www.bignerdranch.com/about-us/nerds/kar-loong-wong/" target="_blank" rel="external">Kar Loong Wong</a>，一个超厉害的设计师，看了我的总览画面的卡片效果后，直接指出了我用 launcher icon 在总览页面很丑。他说图片显示小了导致上面的螺旋桨形状的 Logo 很难辨认。  </p>
+<p>于是我给 launcher 界面设置了独立的图标。问题来了，manifest 不提供根据 activity 的图标来自定义总览图标的方法。在 WelcomeActivity 设置 android:icon 会被 launcher 图标所覆盖。这意味着我们需要用其他方式来重写总览页的卡片样式。算你运气好，还真有一种方式来实现…  </p>
+<h3 id="通过代码重写总览界面卡片样式"><a href="#通过代码重写总览界面卡片样式" class="headerlink" title="通过代码重写总览界面卡片样式"></a>通过代码重写总览界面卡片样式</h3><p>Lollipop 可以在程序运行时设置 <a href="https://developer.android.com/intl/es/reference/android/app/ActivityManager.TaskDescription.html" target="_blank" rel="external">TaskDescription</a> .这将会覆盖总览卡片的图片，背景色和标签。  </p>
+<p>TaskDescription 默认基于任务的 activity 栈的 activity。其他的 Activity 不会影响样式，除非这些 Activity 在运行(run time)时明确的设置了 TaskDescription. 任务栈中最顶端的设置了 TaskDescription 的 Activity 将会生效（覆盖了 manifest 或者其他设置了 TaskDescription Activity 的效果）  </p>
+<p>下面的代码段来自 <a href="https://github.com/kristinmars/LollipopOverviewStylingDemo/blob/master/app/src/main/java/com/bignerdranch/android/bignerdranch/WelcomeActivity.java" target="_blank" rel="external">WelcomeActivity.java</a>，演示了如何创建及设置一个 task description :  </p>
+<pre><code>public class WelcomeActivity extends ActionBarActivity {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_welcome);
+
+        if (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.LOLLIPOP) {
+
+            TypedValue typedValue = new TypedValue();
+            Resources.Theme theme = getTheme();
+            theme.resolveAttribute(R.attr.colorPrimary, typedValue, true);
+            int color = typedValue.data;
+
+            Bitmap bm = BitmapFactory.decodeResource(getResources(), R.drawable.ic_activity_welcome);
+            ActivityManager.TaskDescription td = new ActivityManager.TaskDescription(null, bm, color);
+
+            setTaskDescription(td);
+            bm.recycle();
+
+        }
+    }
+    ...
+}
+</code></pre><p>Activity.setTaskDescription() 只在 API 21(Lollipop)及以上版本可用。为了在适配旧设备的同时在新设备上有较好的展示效果，我们需要在使用 TaskDescription 前进行 API 版本的判断。  </p>
+<p>我们使用 TaskDescription 的需要三个参数的构造函数 <a href="http://developer.android.com/intl/es/reference/android/app/ActivityManager.TaskDescription.html#ActivityManager.TaskDescription(java.lang.String, android.graphics.Bitmap, int" target="_blank" rel="external">ActivityManager.TaskDescription(String label, Bitmap icon, int colorPrimary)</a>) 来创建一个 TaskDescription 实例。不要使用 TaskDescription 的其他构造函数；他们都忽略的 colorPrimary 的设置。  </p>
+<p>如果你没有给标签（label）赋值或者传了一个空值，系统将会读取 manifest 中的值。  </p>
+<p>colorPrimary 直接根据主题获取。这种情况下，你不需要在许多地方修改色板的值。我建议你直接使用 colorPrimary 的值，除非你有很好的理由。注意，primary color <strong>一定要设置成不透明</strong>的。否则，系统将会抛出 runtime exception.  </p>
+<p>最后，调用 setTaskDescription() 方法使 TaskDescription 实例与 Activity 实例关联。  </p>
+<p>最后的效果如下（一个独立的 launcher 和 总览图标）：<br><img src="http://ww4.sinaimg.cn/mw690/6db4aff6jw1f1zxnbks5qj20go08rgmv.jpg" alt="">  </p>
+<h3 id="当心不标准的-Toolbar"><a href="#当心不标准的-Toolbar" class="headerlink" title="当心不标准的 Toolbar"></a>当心不标准的 Toolbar</h3><p>总览卡片实际上是将一个 top bar 覆盖到程序截图上。默认情况下 Toolbar 跟 top bar 的尺寸是相同的。如果 Toolbar 的高度大于默认高度，那么 Toolbar 将会在 top bar 底部出现一部分内容。如果应用程序没有 Toolbar 或者你的 Toolbar 不是标准的，或者你的 Toolbar 比默认的尺寸小，我们将会看到一个被裁剪的截图。  </p>
+<p>原文地址：<a href="https://www.bignerdranch.com/blog/polishing-your-Android-overview-screen-entry/#fnref:1" target="_blank" rel="external">https://www.bignerdranch.com/blog/polishing-your-Android-overview-screen-entry/#fnref:1</a></p>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Overview/" rel="tag">#Overview</a>
+          
+            <a href="/tags/Lollipop/" rel="tag">#Lollipop</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/03/07/appcompat_23.2_day_night/" rel="next" title="「译」AppCompat v23.2 - 夜间模式最佳实践">
+                <i class="fa fa-chevron-left"></i> 「译」AppCompat v23.2 - 夜间模式最佳实践
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/04/23/advanced_features_of_Anko/" rel="prev" title="「译」 Anko 的高级功能">
+                「译」 Anko 的高级功能 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <div class="ds-share flat" data-thread-key="2016/03/17/overview_screen/"
+     data-title="「译」Android 总览画面（Overview Screen）详解"
+     data-content=""
+     data-url="http://kingideayou.github.io/2016/03/17/overview_screen/">
+  <div class="ds-share-inline">
+    <ul  class="ds-share-icons-16">
+
+      <li data-toggle="ds-share-icons-more"><a class="ds-more" href="javascript:void(0);">分享到：</a></li>
+      <li><a class="ds-weibo" href="javascript:void(0);" data-service="weibo">微博</a></li>
+      <li><a class="ds-qzone" href="javascript:void(0);" data-service="qzone">QQ空间</a></li>
+      <li><a class="ds-qqt" href="javascript:void(0);" data-service="qqt">腾讯微博</a></li>
+      <li><a class="ds-wechat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+
+    </ul>
+    <div class="ds-share-icons-more">
+    </div>
+  </div>
+</div>
+      
+    </div>
+  </div>
+
+
+        </div>
+
+        
+
+
+        
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2016/03/17/overview_screen/"
+           data-title="「译」Android 总览画面（Overview Screen）详解" data-url="http://kingideayou.github.io/2016/03/17/overview_screen/">
+      </div>
+    
+  </div>
+
+
+      </div>
+
+      
+        
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Inhaltsverzeichnis
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Übersicht
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="/images/default_avatar.jpg" alt="NeXT" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">NeXT</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description"></p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">23</span>
+              <span class="site-state-item-name">Artikel</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">29</span>
+              <span class="site-state-item-name">Kategorien</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">30</span>
+              <span class="site-state-item-name">Tags</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#默认的总览画面（Overview-Card）样式和-XML"><span class="nav-number">1.</span> <span class="nav-text">默认的总览画面（Overview Card）样式和 XML</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#向下兼容和-colorPrimary"><span class="nav-number">1.1.</span> <span class="nav-text">向下兼容和 colorPrimary</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#默认样式：使用-XML-的限制"><span class="nav-number">2.</span> <span class="nav-text">默认样式：使用 XML 的限制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#通过代码重写总览界面卡片样式"><span class="nav-number">3.</span> <span class="nav-text">通过代码重写总览界面卡片样式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#当心不标准的-Toolbar"><span class="nav-number">4.</span> <span class="nav-text">当心不标准的 Toolbar</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+      
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">NeXT</span>
+</div>
+
+<div class="powered-by">
+  Erstellt mit  <a class="theme-link" href="http://hexo.io">Hexo</a>
+</div>
+
+<div class="theme-info">
+  Theme -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT
+  </a>
+</div>
+
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+    
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"nblog"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+    
+     
+
+
+    
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.2"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.2"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+<script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+<script type="text/javascript" src="/js/motion.js?v=0.4.5.2" id="motion.global"></script>
+
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.2" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    motionMiddleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+      if (CONFIG.sidebar === 'post') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  <script type="text/javascript" src="/js/bootstrap.js"></script>
+
+  
+  
+
+  
+  
+
+  
+     <!-- custom analytics part create by xiamo -->
+<script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+<script>AV.initialize("Bfw8DjNmL4FLoxqoz3vUlLGd-gzGzoHsz", "33hHJV3K3Am3vhOw5AghkoOG");</script>
+<script>
+function showTime(Counter) {
+	var query = new AV.Query(Counter);
+	$(".leancloud_visitors").each(function() {
+		var url = $(this).attr("id").trim();
+		query.equalTo("url", url);
+		query.find({
+			success: function(results) {
+				if (results.length == 0) {
+					var content = $(document.getElementById(url)).text() + ': 0';
+					$(document.getElementById(url)).text(content);
+					return;
+				}
+				for (var i = 0; i < results.length; i++) {
+					var object = results[i];
+					var content = $(document.getElementById(url)).text() + ': ' + object.get('time');
+					$(document.getElementById(url)).text(content);
+				}
+			},
+			error: function(object, error) {
+				console.log("Error: " + error.code + " " + error.message);
+			}
+		});
+
+	});
+}
+
+function addCount(Counter) {
+	var Counter = AV.Object.extend("Counter");
+	url = $(".leancloud_visitors").attr('id').trim();
+	title = $(".leancloud_visitors").attr('data-flag-title').trim();
+	var query = new AV.Query(Counter);
+	query.equalTo("url", url);
+	query.find({
+		success: function(results) {
+			if (results.length > 0) {
+				var counter = results[0];
+				counter.fetchWhenSave(true);
+				counter.increment("time");
+				counter.save(null, {
+					success: function(counter) {
+						var content = $(document.getElementById(url)).text() + ': ' + counter.get('time');
+						$(document.getElementById(url)).text(content);
+					},
+					error: function(counter, error) {
+						console.log('Failed to save Visitor num, with error message: ' + error.message);
+					}
+				});
+			} else {
+				var newcounter = new Counter();
+				newcounter.set("title", title);
+				newcounter.set("url", url);
+				newcounter.set("time", 1);
+				newcounter.save(null, {
+					success: function(newcounter) {
+					    console.log("newcounter.get('time')="+newcounter.get('time'));
+						var content = $(document.getElementById(url)).text() + ': ' + newcounter.get('time');
+						$(document.getElementById(url)).text(content);
+					},
+					error: function(newcounter, error) {
+						console.log('Failed to create');
+					}
+				});
+			}
+		},
+		error: function(error) {
+			console.log('Error:' + error.code + " " + error.message);
+		}
+	});
+}
+$(function() {
+	var Counter = AV.Object.extend("Counter");
+	if ($('.leancloud_visitors').length == 1) {
+		addCount(Counter);
+	} else if ($('.post-title-link').length > 1) {
+		showTime(Counter);
+	}
+}); 
+</script>
+
+  
+
+</body>
+</html>

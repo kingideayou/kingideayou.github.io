@@ -1,0 +1,899 @@
+<!doctype html>
+<html class="theme-next   use-motion ">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.4.5.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="开源项目,Github,知乎," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.2" />
+
+
+
+
+
+
+<meta name="description" content="前言在 打造自己的 PagerSlidingTabStrip 之二 （选中后 Tab 变色） 中，我们实现了给 PagerSlidingTabStrip 添加滑动时 Tab 颜色改变的效果，当然颜色切换太过生硬，所以我们再进行优化下，实现知乎的 ViewPager 页面的效果。
+效果图知乎效果：
+
+
+我们实现的效果：
+
+
+分析首先来看下知乎的效果图，滑动 ViewPager 时，顶部的 Tab 颜">
+<meta property="og:type" content="article">
+<meta property="og:title" content="打造自己的 PagerSlidingTabStrip 之三 （ViewPager 切换时 Tab 颜色渐变）">
+<meta property="og:url" content="http://kingideayou.github.io/2015/07/06/tab_header_text_color_shade/index.html">
+<meta property="og:site_name" content="NeXT' Note">
+<meta property="og:description" content="前言在 打造自己的 PagerSlidingTabStrip 之二 （选中后 Tab 变色） 中，我们实现了给 PagerSlidingTabStrip 添加滑动时 Tab 颜色改变的效果，当然颜色切换太过生硬，所以我们再进行优化下，实现知乎的 ViewPager 页面的效果。
+效果图知乎效果：
+
+
+我们实现的效果：
+
+
+分析首先来看下知乎的效果图，滑动 ViewPager 时，顶部的 Tab 颜">
+<meta property="og:image" content="https://raw.githubusercontent.com/kingideayou/PagerSlidingTabStripPro/master/pic_3/zhihu_demo_1.gif">
+<meta property="og:image" content="https://raw.githubusercontent.com/kingideayou/PagerSlidingTabStripPro/master/pic_3/zhihu_demo_2.gif">
+<meta property="og:image" content="https://raw.githubusercontent.com/kingideayou/PagerSlidingTabStripPro/master/pic_3/my_demo_1.gif">
+<meta property="og:image" content="https://raw.githubusercontent.com/kingideayou/PagerSlidingTabStripPro/master/pic_3/my_demo_2.gif">
+<meta property="og:updated_time" content="2015-07-11T15:02:34.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="打造自己的 PagerSlidingTabStrip 之三 （ViewPager 切换时 Tab 颜色渐变）">
+<meta name="twitter:description" content="前言在 打造自己的 PagerSlidingTabStrip 之二 （选中后 Tab 变色） 中，我们实现了给 PagerSlidingTabStrip 添加滑动时 Tab 颜色改变的效果，当然颜色切换太过生硬，所以我们再进行优化下，实现知乎的 ViewPager 页面的效果。
+效果图知乎效果：
+
+
+我们实现的效果：
+
+
+分析首先来看下知乎的效果图，滑动 ViewPager 时，顶部的 Tab 颜">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/kingideayou/PagerSlidingTabStripPro/master/pic_3/zhihu_demo_1.gif">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: '',
+    sidebar: 'post',
+    motion: true
+  };
+</script>
+
+  <title> 打造自己的 PagerSlidingTabStrip 之三 （ViewPager 切换时 Tab 颜色渐变） | NeXT' Note </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?de80a1008b1f6fb4125cb9f94992261a";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">NeXT' Note</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu ">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            Startseite
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            Archiv
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-th fa-fw"></i> <br />
+            
+            Kategorien
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-user fa-fw"></i> <br />
+            
+            Über
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                打造自己的 PagerSlidingTabStrip 之三 （ViewPager 切换时 Tab 颜色渐变）
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            Veröffentlicht am
+            <time itemprop="dateCreated" datetime="2015-07-06T23:08:00+08:00" content="2015-07-06">
+              2015-07-06
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; in
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/PagerSlidingTabStrip/" itemprop="url" rel="index">
+                    <span itemprop="name">PagerSlidingTabStrip</span>
+                  </a>
+                </span>
+
+                
+                
+                  . 
+                
+
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/PagerSlidingTabStrip/ViewPager/" itemprop="url" rel="index">
+                    <span itemprop="name">ViewPager</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2015/07/06/tab_header_text_color_shade/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/07/06/tab_header_text_color_shade/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+
+          
+             <span id="/2015/07/06/tab_header_text_color_shade/"class="leancloud_visitors"  data-flag-title="打造自己的 PagerSlidingTabStrip 之三 （ViewPager 切换时 Tab 颜色渐变）">
+                &nbsp; | &nbsp; 阅读次数
+                </span>
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>在 打造自己的 PagerSlidingTabStrip 之二 （选中后 Tab 变色） 中，我们实现了给 <a href="https://github.com/astuetz/PagerSlidingTabStrip" target="_blank" rel="external">PagerSlidingTabStrip</a> 添加滑动时 Tab 颜色改变的效果，当然颜色切换太过生硬，所以我们再进行优化下，实现知乎的 ViewPager 页面的效果。</p>
+<h3 id="效果图"><a href="#效果图" class="headerlink" title="效果图"></a>效果图</h3><p>知乎效果：</p>
+<p><img src="https://raw.githubusercontent.com/kingideayou/PagerSlidingTabStripPro/master/pic_3/zhihu_demo_1.gif" width="300" height="520" alt="效果图" align="center"></p>
+<p><img src="https://raw.githubusercontent.com/kingideayou/PagerSlidingTabStripPro/master/pic_3/zhihu_demo_2.gif" width="300" height="520" alt="效果图" align="center"></p>
+<p>我们实现的效果：</p>
+<p><img src="https://raw.githubusercontent.com/kingideayou/PagerSlidingTabStripPro/master/pic_3/my_demo_1.gif" width="300" height="520" alt="效果图" align="center"></p>
+<p><img src="https://raw.githubusercontent.com/kingideayou/PagerSlidingTabStripPro/master/pic_3/my_demo_2.gif" width="300" height="520" alt="效果图" align="center"></p>
+<h3 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h3><p>首先来看下知乎的效果图，滑动 ViewPager 时，顶部的 Tab 颜色会随之渐变，被选中 Tab 的颜色会比其他 Tab 的颜色更深，并且被选中和将被选中的 Tab 的颜色根据 ViewPager 滑动的位移有渐变的效果。</p>
+<p>在<a href="http://kingideayou.github.io/2015/07/05/tab_header_text_color">上一章</a>中我们实现了给 Tab 添加滑动变色效果，但是只实现了滑动时颜色的改变，我们注意在 ViewPager 的滑动监听 OnPageChangeListener 接口中有个回调方法 onPageScrolled 会返回一个参数 positionOffset，给我们提供页面的偏移量，根据这个偏移量，我们可以手动改变 Tab 的颜色。</p>
+<pre><code>//positionOffset 为偏移量
+@Override
+public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+}
+</code></pre><h3 id="代码及解析"><a href="#代码及解析" class="headerlink" title="代码及解析"></a>代码及解析</h3><p>根据上面的分析，我们可以通过偏移量改变来设置 Tab 的颜色。那么我们首先要修改下 updateTabColor() 方法。</p>
+<pre><code>//这里的 value 为偏移量
+private void updateTabColor(View tabView, float value) {
+    if (tabType == TAB_TYPE_TEXT) {
+        updateTextViewColor(tabView, value);
+    } else {
+        updateImageButtonAlpha(tabView, value);
+    }
+}
+</code></pre><p>对应的我们要修改 updateTextViewColor() 方法和 updateImageButtonAlpha 方法，这里我们更改 TextView 颜色的方法是通过偏移量计算出对应的透明度，然后通过 Color.arb(int alpha, int red, int green, int blue) 方法获取到对应的颜色后，设置到 TextView 中，代码如下：</p>
+<pre><code>//更新所有 TextView 文字颜色
+  private void updateTextViewColor(View tabView, float currentPositionOffset) {
+  //currentAlpha 为透明度， currentAlpha = 255 时，颜色为不透明，默认为 155
+      int currentAlpha = (int)(155 + currentPositionOffset * 100);
+      if (tabView instanceof TextView) {
+          ((TextView) tabView).setTextColor(Color.argb(currentAlpha, Color.red(tabTextColor), Color.green(tabTextColor), Color.blue(tabTextColor)));
+      } else if (tabView instanceof FrameLayout
+              &amp;&amp; ((FrameLayout) tabView).getChildAt(0) instanceof TextView) {
+          ((TextView) ((FrameLayout) tabView).getChildAt(0)).setTextColor(Color.argb(currentAlpha, Color.red(tabTextColor), Color.green(tabTextColor), Color.blue(tabTextColor)));
+      }
+  }
+</code></pre><p>设置 ImageButton 的透明度就相对容易一些了，只要获取到要设置的透明度就可以了，代码如下：</p>
+<pre><code>private void updateImageButtonAlpha(View tabView, float currentPositionOffset) {
+  int alphaInteger = (int)(155 + currentPositionOffset * 100);
+  float alpha = 0.5f + currentPositionOffset * 0.5f;
+
+  if(tabView instanceof ImageButton) {
+    if (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.HONEYCOMB) {
+      tabView.setAlpha(alpha);
+    } else {
+      ((ImageButton)tabView).setAlpha(alphaInteger);
+    }
+  } else if (tabView instanceof FrameLayout
+    &amp;&amp; ((FrameLayout) tabView).getChildAt(0) instanceof ImageButton) {
+    if (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.HONEYCOMB) {
+      ((FrameLayout) tabView).getChildAt(0).setAlpha(alpha);
+    } else {
+      ((ImageButton) ((FrameLayout) tabView).getChildAt(0)).setAlpha(alphaInteger);
+    }
+  }
+}
+</code></pre><p>最近想把知乎的所有效果尽量实现一下，因为知乎告诉我：认真你就赢了。</p>
+<h3 id="最后，项目-Github-地址-，欢迎-Star"><a href="#最后，项目-Github-地址-，欢迎-Star" class="headerlink" title="最后，项目 Github 地址 ，欢迎 Star ^-^"></a>最后，<a href="https://github.com/kingideayou/PagerSlidingTabStripPro" target="_blank" rel="external">项目 Github 地址</a> ，欢迎 Star ^-^</h3></span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/开源项目/" rel="tag">#开源项目</a>
+          
+            <a href="/tags/Github/" rel="tag">#Github</a>
+          
+            <a href="/tags/知乎/" rel="tag">#知乎</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/07/05/tab_header_text_color/" rel="next" title="打造自己的 PagerSlidingTabStrip 之二 （选中后 Tab 变色）">
+                <i class="fa fa-chevron-left"></i> 打造自己的 PagerSlidingTabStrip 之二 （选中后 Tab 变色）
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2015/07/11/screenshot/" rel="prev" title="Android 应用内截屏（去除状态栏）">
+                Android 应用内截屏（去除状态栏） <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <div class="ds-share flat" data-thread-key="2015/07/06/tab_header_text_color_shade/"
+     data-title="打造自己的 PagerSlidingTabStrip 之三 （ViewPager 切换时 Tab 颜色渐变）"
+     data-content=""
+     data-url="http://kingideayou.github.io/2015/07/06/tab_header_text_color_shade/">
+  <div class="ds-share-inline">
+    <ul  class="ds-share-icons-16">
+
+      <li data-toggle="ds-share-icons-more"><a class="ds-more" href="javascript:void(0);">分享到：</a></li>
+      <li><a class="ds-weibo" href="javascript:void(0);" data-service="weibo">微博</a></li>
+      <li><a class="ds-qzone" href="javascript:void(0);" data-service="qzone">QQ空间</a></li>
+      <li><a class="ds-qqt" href="javascript:void(0);" data-service="qqt">腾讯微博</a></li>
+      <li><a class="ds-wechat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+
+    </ul>
+    <div class="ds-share-icons-more">
+    </div>
+  </div>
+</div>
+      
+    </div>
+  </div>
+
+
+        </div>
+
+        
+
+
+        
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2015/07/06/tab_header_text_color_shade/"
+           data-title="打造自己的 PagerSlidingTabStrip 之三 （ViewPager 切换时 Tab 颜色渐变）" data-url="http://kingideayou.github.io/2015/07/06/tab_header_text_color_shade/">
+      </div>
+    
+  </div>
+
+
+      </div>
+
+      
+        
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Inhaltsverzeichnis
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Übersicht
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="/images/default_avatar.jpg" alt="NeXT" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">NeXT</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description"></p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">23</span>
+              <span class="site-state-item-name">Artikel</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">29</span>
+              <span class="site-state-item-name">Kategorien</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">30</span>
+              <span class="site-state-item-name">Tags</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#效果图"><span class="nav-number">2.</span> <span class="nav-text">效果图</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#分析"><span class="nav-number">3.</span> <span class="nav-text">分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#代码及解析"><span class="nav-number">4.</span> <span class="nav-text">代码及解析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#最后，项目-Github-地址-，欢迎-Star"><span class="nav-number">5.</span> <span class="nav-text">最后，项目 Github 地址 ，欢迎 Star ^-^</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+      
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">NeXT</span>
+</div>
+
+<div class="powered-by">
+  Erstellt mit  <a class="theme-link" href="http://hexo.io">Hexo</a>
+</div>
+
+<div class="theme-info">
+  Theme -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT
+  </a>
+</div>
+
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+    
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"nblog"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+    
+     
+
+
+    
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.2"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.2"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+<script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+<script type="text/javascript" src="/js/motion.js?v=0.4.5.2" id="motion.global"></script>
+
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.2" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    motionMiddleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+      if (CONFIG.sidebar === 'post') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  <script type="text/javascript" src="/js/bootstrap.js"></script>
+
+  
+  
+
+  
+  
+
+  
+     <!-- custom analytics part create by xiamo -->
+<script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+<script>AV.initialize("Bfw8DjNmL4FLoxqoz3vUlLGd-gzGzoHsz", "33hHJV3K3Am3vhOw5AghkoOG");</script>
+<script>
+function showTime(Counter) {
+	var query = new AV.Query(Counter);
+	$(".leancloud_visitors").each(function() {
+		var url = $(this).attr("id").trim();
+		query.equalTo("url", url);
+		query.find({
+			success: function(results) {
+				if (results.length == 0) {
+					var content = $(document.getElementById(url)).text() + ': 0';
+					$(document.getElementById(url)).text(content);
+					return;
+				}
+				for (var i = 0; i < results.length; i++) {
+					var object = results[i];
+					var content = $(document.getElementById(url)).text() + ': ' + object.get('time');
+					$(document.getElementById(url)).text(content);
+				}
+			},
+			error: function(object, error) {
+				console.log("Error: " + error.code + " " + error.message);
+			}
+		});
+
+	});
+}
+
+function addCount(Counter) {
+	var Counter = AV.Object.extend("Counter");
+	url = $(".leancloud_visitors").attr('id').trim();
+	title = $(".leancloud_visitors").attr('data-flag-title').trim();
+	var query = new AV.Query(Counter);
+	query.equalTo("url", url);
+	query.find({
+		success: function(results) {
+			if (results.length > 0) {
+				var counter = results[0];
+				counter.fetchWhenSave(true);
+				counter.increment("time");
+				counter.save(null, {
+					success: function(counter) {
+						var content = $(document.getElementById(url)).text() + ': ' + counter.get('time');
+						$(document.getElementById(url)).text(content);
+					},
+					error: function(counter, error) {
+						console.log('Failed to save Visitor num, with error message: ' + error.message);
+					}
+				});
+			} else {
+				var newcounter = new Counter();
+				newcounter.set("title", title);
+				newcounter.set("url", url);
+				newcounter.set("time", 1);
+				newcounter.save(null, {
+					success: function(newcounter) {
+					    console.log("newcounter.get('time')="+newcounter.get('time'));
+						var content = $(document.getElementById(url)).text() + ': ' + newcounter.get('time');
+						$(document.getElementById(url)).text(content);
+					},
+					error: function(newcounter, error) {
+						console.log('Failed to create');
+					}
+				});
+			}
+		},
+		error: function(error) {
+			console.log('Error:' + error.code + " " + error.message);
+		}
+	});
+}
+$(function() {
+	var Counter = AV.Object.extend("Counter");
+	if ($('.leancloud_visitors').length == 1) {
+		addCount(Counter);
+	} else if ($('.post-title-link').length > 1) {
+		showTime(Counter);
+	}
+}); 
+</script>
+
+  
+
+</body>
+</html>

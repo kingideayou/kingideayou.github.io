@@ -1,0 +1,957 @@
+<!doctype html>
+<html class="theme-next   use-motion ">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.4.5.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="CoordinatorLayout,Behavior," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.2" />
+
+
+
+
+
+
+<meta name="description" content="如果你要探索 Android Design Support Library ，那么你一定会接触到 CoordinatorLayout ，因为许多 Design Library 的视图都需要 CoordinatorLayout. 为什么呢？CoordinatorLayout 本身并没有做什么:其实它就是一个 FrameLayout. 那么， CoordinatorLayout 的炫酷效果要怎么实现">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CoordinatorLayout Behavior 详解">
+<meta property="og:url" content="http://kingideayou.github.io/2016/02/19/Intercepting_everything_with_CoordinatorLayout_behaviors/index.html">
+<meta property="og:site_name" content="NeXT' Note">
+<meta property="og:description" content="如果你要探索 Android Design Support Library ，那么你一定会接触到 CoordinatorLayout ，因为许多 Design Library 的视图都需要 CoordinatorLayout. 为什么呢？CoordinatorLayout 本身并没有做什么:其实它就是一个 FrameLayout. 那么， CoordinatorLayout 的炫酷效果要怎么实现">
+<meta property="og:image" content="http://ww4.sinaimg.cn/mw690/6db4aff6gw1f1bohqaz48j20bg09gdfz.jpg">
+<meta property="og:updated_time" content="2016-02-25T08:50:03.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="CoordinatorLayout Behavior 详解">
+<meta name="twitter:description" content="如果你要探索 Android Design Support Library ，那么你一定会接触到 CoordinatorLayout ，因为许多 Design Library 的视图都需要 CoordinatorLayout. 为什么呢？CoordinatorLayout 本身并没有做什么:其实它就是一个 FrameLayout. 那么， CoordinatorLayout 的炫酷效果要怎么实现">
+<meta name="twitter:image" content="http://ww4.sinaimg.cn/mw690/6db4aff6gw1f1bohqaz48j20bg09gdfz.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: '',
+    sidebar: 'post',
+    motion: true
+  };
+</script>
+
+  <title> CoordinatorLayout Behavior 详解 | NeXT' Note </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?de80a1008b1f6fb4125cb9f94992261a";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">NeXT' Note</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu ">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            Startseite
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            Archiv
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-th fa-fw"></i> <br />
+            
+            Kategorien
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-user fa-fw"></i> <br />
+            
+            Über
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                CoordinatorLayout Behavior 详解
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            Veröffentlicht am
+            <time itemprop="dateCreated" datetime="2016-02-19T15:30:26+08:00" content="2016-02-19">
+              2016-02-19
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; in
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/CoordinatorLayout/" itemprop="url" rel="index">
+                    <span itemprop="name">CoordinatorLayout</span>
+                  </a>
+                </span>
+
+                
+                
+                  . 
+                
+
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/CoordinatorLayout/Behavior/" itemprop="url" rel="index">
+                    <span itemprop="name">Behavior</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/02/19/Intercepting_everything_with_CoordinatorLayout_behaviors/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/02/19/Intercepting_everything_with_CoordinatorLayout_behaviors/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+
+          
+             <span id="/2016/02/19/Intercepting_everything_with_CoordinatorLayout_behaviors/"class="leancloud_visitors"  data-flag-title="CoordinatorLayout Behavior 详解">
+                &nbsp; | &nbsp; 阅读次数
+                </span>
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><p><img src="http://ww4.sinaimg.cn/mw690/6db4aff6gw1f1bohqaz48j20bg09gdfz.jpg" alt=""></p>
+<p>如果你要探索 <a href="http://android-developers.blogspot.hk/2015/05/android-design-support-library.html" target="_blank" rel="external">Android Design Support Library</a> ，那么你一定会接触到 <a href="http://developer.android.com/intl/zh-cn/reference/android/support/design/widget/CoordinatorLayout.html" target="_blank" rel="external">CoordinatorLayout</a> ，因为许多 Design Library 的视图都需要 CoordinatorLayout. 为什么呢？CoordinatorLayout 本身并没有做什么:其实它就是一个 FrameLayout. 那么， CoordinatorLayout 的炫酷效果要怎么实现的呢？其实 CoordinatorLayout 是依赖 <a href="http://developer.android.com/intl/zh-cn/reference/android/support/design/widget/CoordinatorLayout.Behavior.html" target="_blank" rel="external">CoordinatorLayout.Behavior</a> 来实现的。通过给 CoordinatorLayout 的子布局添加 Behavior ，我们可以<code>拦截触摸事件</code>，<code>window insets</code>, <code>measurement</code>, <code>layout</code>, 还有 <code>nested scrolling</code>. Design Library 大量使用 Behaviors 来实现我们所见到的功能。</p>
+<h3 id="创建-Behavior"><a href="#创建-Behavior" class="headerlink" title="创建 Behavior"></a>创建 Behavior</h3><p>创建 Behavior 非常简单，只需要继承 Behavior</p>
+<pre><code>public class FancyBehavior&lt;V extends View&gt;
+    extends CoordinatorLayout.Behavior&lt;V&gt; {
+  /**
+   * Default constructor for instantiating a FancyBehavior in code.
+   */
+  public FancyBehavior() {
+  }
+  /**
+   * Default constructor for inflating a FancyBehavior from layout.
+   *
+   * @param context The {@link Context}.
+   * @param attrs The {@link AttributeSet}.
+   */
+  public FancyBehavior(Context context, AttributeSet attrs) {
+    super(context, attrs);
+    // Extract any custom attributes out
+    // preferably prefixed with behavior_ to denote they
+    // belong to a behavior
+  }
+}
+</code></pre><p>你可以给任何<code>View</code>添加 FancyBehavior 监听。如果你只想给指定的<code>View</code>添加<code>Behavior</code>，可以这么写：</p>
+<pre><code>public class FancyFrameLayoutBehavior
+extends CoordinatorLayout.Behavior&lt;FancyFrameLayout&gt;
+</code></pre><p>这样可以把你从<code>View</code>接收到的参数转化成正确的类型，默认方式会全部转换。</p>
+<p>通过<a href="http://developer.android.com/intl/zh-cn/reference/android/support/design/widget/CoordinatorLayout.Behavior.html?utm_campaign=adp_series_coordinatorlayoutbehavior_021716&amp;utm_source=medium&amp;utm_medium=blog#setTag%28android.view.View,%20java.lang.Object%29" target="_blank" rel="external"><code>Behavior.setTag()</code></a>/<a href="http://developer.android.com/reference/android/support/design/widget/CoordinatorLayout.Behavior.html?utm_campaign=adp_series_coordinatorlayoutbehavior_021716&amp;utm_source=medium&amp;utm_medium=blog#getTag%28android.view.View%29" target="_blank" rel="external"><code>Behavior.getTag()</code></a>方法，结合<a href="http://developer.android.com/intl/zh-cn/reference/android/support/design/widget/CoordinatorLayout.Behavior.html?utm_campaign=adp_series_coordinatorlayoutbehavior_021716&amp;utm_source=medium&amp;utm_medium=blog#onSaveInstanceState%28android.support.design.widget.CoordinatorLayout,%20V%29" target="_blank" rel="external"><code>onSaveInstanceState()</code></a>/<a href="http://developer.android.com/intl/zh-cn/reference/android/support/design/widget/CoordinatorLayout.Behavior.html?utm_campaign=adp_series_coordinatorlayoutbehavior_021716&amp;utm_source=medium&amp;utm_medium=blog#onRestoreInstanceState%28android.support.design.widget.CoordinatorLayout,%20V,%20android.os.Parcelable%29" target="_blank" rel="external"><code>onRestoreInstanceState()</code></a>可以存储临时数据。我们建议你在创建<code>Behavior</code>时尽量轻量一些，不过这些方法为我们提供了创建<code>可保存状态的 Behavior</code>的可能。</p>
+<p>###绑定行为（Attaching a Behavior）<br>当然，<code>Behavior</code>需要绑定在<code>CoordinatorLayout</code>的子视图上并且确认被调用，否则它没有任何效果。有三种完成绑定的方式：通过代码、通过 XML或者通过注解</p>
+<p>####通过代码绑定<code>Behavior</code>(Attaching a Behavior programmatically)<br>当你想把<code>Behavior</code>绑定在<code>CoordinatorLayout</code>的子视图中，你一定要知道<strong><code>Behavior</code>是存储在每个视图的 LayoutParams 中的</strong> - Behavior 必须声明在 CoordinatorLayout 的直系的子视图，因为只有这些子视图拥有 LayoutParams 的明确的 Behavior 基类。</p>
+<pre><code>FancyBehavior fancyBehavior = new FancyBehavior();
+CoordinatorLayout.LayoutParams params =
+    (CoordinatorLayout.LayoutParams) yourView.getLayoutParams();
+params.setBehavior(fancyBehavior);
+</code></pre><p>上面这个例子中，我们使用默认的，无参数的构造函数。这并不代表你不能使用构造函数来传递参数-当你通过代码完成这些的时候，你是不受限的。</p>
+<p>####通过 XML 绑定 Behavior（Attaching a Behavior in XML）<br>每次都需要通过代码设置，会有一点乱。就像大多数自定义的<code>LayoutParams</code>一样，有对应的<code>layout_attribute</code>来做相同的事。下面这个例子，是使用<code>la
+yout_behavior</code>属性：</p>
+<pre><code>&lt;FrameLayout
+  android:layout_height=”wrap_content”
+  android:layout_width=”match_parent”
+  app:layout_behavior=”.FancyBehavior” /&gt;
+</code></pre><p>与通过代码设置不同，<code>FancyBehavior(Context context, AttributeSet attrs)</code>构造函数会默认被调用，当然，你可以通过<code>XML</code>的<code>AttributeSet</code>来声明其他属性（如果你需要其他开发者通过 XML 修改你的 Behavior 的方法）。</p>
+<blockquote>
+<p>相似的<code>layout_naming</code>属性命名方式，可以帮助我们在代码中更好的理解和解析，推荐为所有声明的<code>Behavior</code>属性使用<code>behavior_</code>前缀。</p>
+</blockquote>
+<p>####通过注解自动绑定 Behavior（Attaching a Behavior automatically）</p>
+<p>如果你创建一个需要自定义 Behavior 的自定义视图（就像很多 Design Library 提供的很多效果的例子），你可能希望默认绑定一些行为，不需要每次都使用代码或者 XML 配置。想做到这些，你的自定义视图只需要在它的类的第一行加上一个简单地注释：</p>
+<pre><code>@CoordinatorLayout.DefaultBehavior(FancyFrameLayoutBehavior.class)
+public class FancyFrameLayout extends FrameLayout {
+}
+</code></pre><p>上述代码将会调用 Behavior 的默认构造函数，这样与代码绑定<code>Behavior</code>非常相似。注意：所有<code>layout_behavior</code>属性，都需要覆盖<a href="http://developer.android.com/intl/zh-cn/reference/android/support/design/widget/CoordinatorLayout.DefaultBehavior.html?utm_campaign=adp_series_coordinatorlayoutbehavior_021716" target="_blank" rel="external"><code>DefaultBehavior</code></a></p>
+<p>###监听触摸事件（Intercepting Touch Events）</p>
+<p>一旦你配置完成你的 behavior，就可以做一些对应的操作。Behavior 的众多功能之一就是监听触摸事件。</p>
+<p>在没有<em>CoordinatorLayout</em>时，我们都需要了解<em>ViewGroup</em>的<a href="http://developer.android.com/intl/zh-cn/training/gestures/viewgroup.html?utm_campaign=adp_series_coordinatorlayoutbehavior_021716" target="_blank" rel="external">管理触摸事件</a>。然而，有了<em>CoordinatorLayout</em>后，<em>CoordinatorLayout</em>会把它的<a href="http://developer.android.com/intl/zh-cn/reference/android/view/ViewGroup.html?utm_campaign=adp_series_coordinatorlayoutbehavior_021716&amp;utm_source=medium&amp;utm_medium=blog#onInterceptTouchEvent%28android.view.MotionEvent%29" target="_blank" rel="external"><code>onInterceptTouchEvent()</code></a>自动传给你定义的<code>Behavior</code>的<a href="http://developer.android.com/intl/zh-cn/reference/android/support/design/widget/CoordinatorLayout.Behavior.html?utm_campaign=adp_series_coordinatorlayoutbehavior_021716&amp;utm_source=medium&amp;utm_medium=blog#onInterceptTouchEvent%28android.support.design.widget.CoordinatorLayout,%20V,%20android.view.MotionEvent%29" target="_blank" rel="external">onInterceptTouchEvent()</a>，<strong>你的 Behavior 可以监听 Touch 事件</strong>。如果把返回值设定为 <em>true</em>，自定义的 Behavior 将会接收到 <a href="http://developer.android.com/intl/zh-cn/reference/android/support/design/widget/CoordinatorLayout.Behavior.html?utm_campaign=adp_series_coordinatorlayoutbehavior_021716&amp;utm_source=medium&amp;utm_medium=blog#onTouchEvent%28android.support.design.widget.CoordinatorLayout,%20V,%20android.view.MotionEvent%29" target="_blank" rel="external"><code>onTouchEvent()</code></a> 的全部触摸事件（此时触摸事件被拦截，其他视图都不接收到触摸事件）。例如：<a href="http://developer.android.com/intl/zh-cn/reference/android/support/design/widget/SwipeDismissBehavior.html?utm_campaign=adp_series_coordinatorlayoutbehavior_021716&amp;utm_source=medium&amp;utm_medium=blog" target="_blank" rel="external">SwipeDismissBehavior</a>对所有视图都有效。</p>
+<p>另外，如果 <a href="http://developer.android.com/intl/zh-cn/reference/android/support/design/widget/CoordinatorLayout.Behavior.html?utm_campaign=adp_series_coordinatorlayoutbehavior_021716&amp;utm_source=medium&amp;utm_medium=blog#blocksInteractionBelow%28android.support.design.widget.CoordinatorLayout,%20V%29" target="_blank" rel="external"><code>blocksInteractionBelow()</code></a> 返回 <code>true</code>，则可以切断任何视图间的互相交流。当然，你需要通过给用户提供一些视觉信息，来告诉用户动画的交互效果已经结束（以免用户以为程序挂掉了）。<code>blocksInteractionBelow()</code>方法的默认返回值依赖于<a href="http://developer.android.com/intl/zh-cn/reference/android/support/design/widget/CoordinatorLayout.Behavior.html?utm_campaign=adp_series_coordinatorlayoutbehavior_021716&amp;utm_source=medium&amp;utm_medium=blog#getScrimOpacity%28android.support.design.widget.CoordinatorLayout,%20V%29" target="_blank" rel="external"><code>getScrimOpacity()</code></a> 方法，如果<code>getScrimOpacity()</code>方法返回一个不为零的值时，CoordinatorLayout 将会在视图的上层绘制一个遮罩的颜色（色值来自<a href="http://developer.android.com/reference/android/support/design/widget/CoordinatorLayout.Behavior.html?utm_campaign=adp_series_coordinatorlayoutbehavior_021716&amp;utm_source=medium&amp;utm_medium=blog#getScrimColor%28android.support.design.widget.CoordinatorLayout,%20V%29" target="_blank" rel="external"><code>getScrimColor()</code></a>，默认颜色是黑色）并且停止触摸事件。</p>
+<h4 id="监听窗口插入（Intercepting-Window-Insets"><a href="#监听窗口插入（Intercepting-Window-Insets" class="headerlink" title="监听窗口插入（Intercepting Window Insets)"></a>监听窗口插入（Intercepting Window Insets)</h4><p>假设你阅读过 <a href="https://medium.com/google-developers/why-would-i-want-to-fitssystemwindows-4e26d9ce1eec?utm_campaign=adp_series_coordinatorlayoutbehavior_021716&amp;utm_source=medium&amp;utm_medium=blog" target="_blank" rel="external"><code>我为什么使用 fitsSystemWindows</code></a> 这篇博客。我们深入的讲解了 fitsSystemWindows 到底做了什么，归根结底就是告诉你窗口<code>Window</code>要避免插入到系统窗体（比如： status bar 和 navigation bar）的下层。Behaviors 有它自己的处理方式（如果视图使用了<em>fitsSystemWindows=”true”</em>，那么任何绑定的 <em>Behavior</em> 都会调用 <a href="http://developer.android.com/reference/android/support/design/widget/CoordinatorLayout.Behavior.html?utm_campaign=adp_series_coordinatorlayoutbehavior_021716&amp;utm_source=medium&amp;utm_medium=blog#onApplyWindowInsets%28android.support.design.widget.CoordinatorLayout,%20V,%20android.support.v4.view.WindowInsetsCompat%29" target="_blank" rel="external"><code>onApplyWindowInsets()</code></a>来给它优先展示在视图最上层的权利）</p>
+<blockquote>
+<p>注：大多数情况下， Behavior 没有占据整个窗体，它需要通过<a href="http://developer.android.com/intl/zh-cn/reference/android/support/v4/view/ViewCompat.html?utm_campaign=adp_series_coordinatorlayoutbehavior_021716&amp;utm_source=medium&amp;utm_medium=blog#dispatchApplyWindowInsets%28android.view.View,%20android.support.v4.view.WindowInsetsCompat%29http://developer.android.com/intl/zh-cn/reference/android/support/v4/view/ViewCompat.html?utm_campaign=adp_series_coordinatorlayoutbehavior_021716&amp;utm_source=medium&amp;utm_medium=blog#dispatchApplyWindowInsets%28android.view.View,%20android.support.v4.view.WindowInsetsCompat%29" target="_blank" rel="external"><code>ViewCompat.dispatchApplyWindowInsets()</code></a> 来确保所有子视图在窗体中是可见的。</p>
+</blockquote>
+<p>####监听测量和布局（Intercepting Measurement and Layout）<br>测量（<code>Measurement</code>）和布局(<code>Layout</code>)是<a href="http://developer.android.com/guide/topics/ui/how-android-draws.html?utm_campaign=adp_series_coordinatorlayoutbehavior_021716&amp;utm_source=medium&amp;utm_medium=blog" target="_blank" rel="external"><code>绘制视图</code></a>的重要部分。<em>Behaviors</em>也因此变得有意义，所有的监听事件，都通过<a href="http://developer.android.com/intl/zh-cn/reference/android/support/design/widget/CoordinatorLayout.Behavior.html?utm_campaign=adp_series_coordinatorlayoutbehavior_021716&amp;utm_source=medium&amp;utm_medium=blog#onMeasureChild%28android.support.design.widget.CoordinatorLayout,%20V,%20int,%20int,%20int,%20int%29" target="_blank" rel="external"><code>onMeasureChild()</code></a>和<a href="http://developer.android.com/reference/android/support/design/widget/CoordinatorLayout.Behavior.html?utm_campaign=adp_series_coordinatorlayoutbehavior_021716&amp;utm_source=medium&amp;utm_medium=blog#onLayoutChild%28android.support.design.widget.CoordinatorLayout,%20V,%20int%29" target="_blank" rel="external"><code>onLayoutChild()</code></a>的回调获取第一次 measurement 和 layout 信息。</p>
+<p>例如，我们创建一个有最大宽度限制的通用 ViewGroup ：</p>
+<pre><code>/*
+ * Copyright 2015 Google Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+ package com.example.behaviors;
+
+import android.content.Context;
+import android.content.res.TypedArray;
+import android.support.design.widget.CoordinatorLayout;
+import android.util.AttributeSet;
+import android.view.ViewGroup;
+
+import static android.view.View.MeasureSpec;
+
+/**
+ * Behavior that imposes a maximum width on any ViewGroup.
+ *
+ * &lt;p /&gt;Requires an attrs.xml of something like
+ *
+ * &lt;pre&gt;
+ * &amp;lt;declare-styleable name=&quot;MaxWidthBehavior_Params&quot;&amp;gt;
+ *     &amp;lt;attr name=&quot;behavior_maxWidth&quot; format=&quot;dimension&quot;/&amp;gt;
+ * &amp;lt;/declare-styleable&amp;gt;
+ * &lt;/pre&gt;
+ */
+public class MaxWidthBehavior&lt;V extends ViewGroup&gt; extends CoordinatorLayout.Behavior&lt;V&gt; {
+    private int mMaxWidth;
+
+    public MaxWidthBehavior(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        TypedArray a = context.obtainStyledAttributes(attrs,
+                R.styleable.MaxWidthBehavior_Params);
+        mMaxWidth = a.getDimensionPixelSize(
+                R.styleable.MaxWidthBehavior_Params_behavior_maxWidth, 0);
+        a.recycle();
+    }
+
+    @Override
+    public boolean onMeasureChild(CoordinatorLayout parent, V child,
+            int parentWidthMeasureSpec, int widthUsed,
+            int parentHeightMeasureSpec, int heightUsed) {
+        if (mMaxWidth &lt;= 0) {
+            // No max width means this Behavior is a no-op
+            return false;
+        }
+        int widthMode = MeasureSpec.getMode(parentWidthMeasureSpec);
+        int width = MeasureSpec.getSize(parentWidthMeasureSpec);
+
+        if (widthMode == MeasureSpec.UNSPECIFIED || width &gt; mMaxWidth) {
+            // Sorry to impose here, but max width is kind of a big deal
+            width = mMaxWidth;
+            widthMode = MeasureSpec.AT_MOST;
+            parent.onMeasureChild(child,
+                    MeasureSpec.makeMeasureSpec(width, widthMode), widthUsed,
+                    parentHeightMeasureSpec, heightUsed);
+            // We&apos;ve measured the View, so CoordinatorLayout doesn&apos;t have to
+            return true;
+        }
+
+        // Looks like the default measurement will work great
+        return false;
+    }
+}
+</code></pre><p>通用的 Behavior 很方便，但是根据你应用的需求来定义，不是所有的 Behavior 都需要写成通用的。</p>
+<p>###未完待续…</p>
+<p>原文链接：<a href="https://medium.com/google-developers/intercepting-everything-with-coordinatorlayout-behaviors-8c6adc140c26#.f9om9s91r" target="_blank" rel="external">https://medium.com/google-developers/intercepting-everything-with-coordinatorlayout-behaviors-8c6adc140c26#.f9om9s91r</a></p>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/CoordinatorLayout/" rel="tag">#CoordinatorLayout</a>
+          
+            <a href="/tags/Behavior/" rel="tag">#Behavior</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/02/17/share_to_evernote_pocket/" rel="next" title="调用系统分享到指定 App">
+                <i class="fa fa-chevron-left"></i> 调用系统分享到指定 App
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/03/01/recycler_view_23.2/" rel="prev" title="RecyclerView 23.2.0 新特性">
+                RecyclerView 23.2.0 新特性 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <div class="ds-share flat" data-thread-key="2016/02/19/Intercepting_everything_with_CoordinatorLayout_behaviors/"
+     data-title="CoordinatorLayout Behavior 详解"
+     data-content=""
+     data-url="http://kingideayou.github.io/2016/02/19/Intercepting_everything_with_CoordinatorLayout_behaviors/">
+  <div class="ds-share-inline">
+    <ul  class="ds-share-icons-16">
+
+      <li data-toggle="ds-share-icons-more"><a class="ds-more" href="javascript:void(0);">分享到：</a></li>
+      <li><a class="ds-weibo" href="javascript:void(0);" data-service="weibo">微博</a></li>
+      <li><a class="ds-qzone" href="javascript:void(0);" data-service="qzone">QQ空间</a></li>
+      <li><a class="ds-qqt" href="javascript:void(0);" data-service="qqt">腾讯微博</a></li>
+      <li><a class="ds-wechat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+
+    </ul>
+    <div class="ds-share-icons-more">
+    </div>
+  </div>
+</div>
+      
+    </div>
+  </div>
+
+
+        </div>
+
+        
+
+
+        
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2016/02/19/Intercepting_everything_with_CoordinatorLayout_behaviors/"
+           data-title="CoordinatorLayout Behavior 详解" data-url="http://kingideayou.github.io/2016/02/19/Intercepting_everything_with_CoordinatorLayout_behaviors/">
+      </div>
+    
+  </div>
+
+
+      </div>
+
+      
+        
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Inhaltsverzeichnis
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Übersicht
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="/images/default_avatar.jpg" alt="NeXT" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">NeXT</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description"></p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">23</span>
+              <span class="site-state-item-name">Artikel</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">29</span>
+              <span class="site-state-item-name">Kategorien</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">30</span>
+              <span class="site-state-item-name">Tags</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#创建-Behavior"><span class="nav-number">1.</span> <span class="nav-text">创建 Behavior</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#监听窗口插入（Intercepting-Window-Insets"><span class="nav-number">1.1.</span> <span class="nav-text">监听窗口插入（Intercepting Window Insets)</span></a></li></ol></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+      
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">NeXT</span>
+</div>
+
+<div class="powered-by">
+  Erstellt mit  <a class="theme-link" href="http://hexo.io">Hexo</a>
+</div>
+
+<div class="theme-info">
+  Theme -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT
+  </a>
+</div>
+
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+    
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"nblog"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+    
+     
+
+
+    
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.2"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.2"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+<script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+<script type="text/javascript" src="/js/motion.js?v=0.4.5.2" id="motion.global"></script>
+
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.2" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    motionMiddleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+      if (CONFIG.sidebar === 'post') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  <script type="text/javascript" src="/js/bootstrap.js"></script>
+
+  
+  
+
+  
+  
+
+  
+     <!-- custom analytics part create by xiamo -->
+<script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+<script>AV.initialize("Bfw8DjNmL4FLoxqoz3vUlLGd-gzGzoHsz", "33hHJV3K3Am3vhOw5AghkoOG");</script>
+<script>
+function showTime(Counter) {
+	var query = new AV.Query(Counter);
+	$(".leancloud_visitors").each(function() {
+		var url = $(this).attr("id").trim();
+		query.equalTo("url", url);
+		query.find({
+			success: function(results) {
+				if (results.length == 0) {
+					var content = $(document.getElementById(url)).text() + ': 0';
+					$(document.getElementById(url)).text(content);
+					return;
+				}
+				for (var i = 0; i < results.length; i++) {
+					var object = results[i];
+					var content = $(document.getElementById(url)).text() + ': ' + object.get('time');
+					$(document.getElementById(url)).text(content);
+				}
+			},
+			error: function(object, error) {
+				console.log("Error: " + error.code + " " + error.message);
+			}
+		});
+
+	});
+}
+
+function addCount(Counter) {
+	var Counter = AV.Object.extend("Counter");
+	url = $(".leancloud_visitors").attr('id').trim();
+	title = $(".leancloud_visitors").attr('data-flag-title').trim();
+	var query = new AV.Query(Counter);
+	query.equalTo("url", url);
+	query.find({
+		success: function(results) {
+			if (results.length > 0) {
+				var counter = results[0];
+				counter.fetchWhenSave(true);
+				counter.increment("time");
+				counter.save(null, {
+					success: function(counter) {
+						var content = $(document.getElementById(url)).text() + ': ' + counter.get('time');
+						$(document.getElementById(url)).text(content);
+					},
+					error: function(counter, error) {
+						console.log('Failed to save Visitor num, with error message: ' + error.message);
+					}
+				});
+			} else {
+				var newcounter = new Counter();
+				newcounter.set("title", title);
+				newcounter.set("url", url);
+				newcounter.set("time", 1);
+				newcounter.save(null, {
+					success: function(newcounter) {
+					    console.log("newcounter.get('time')="+newcounter.get('time'));
+						var content = $(document.getElementById(url)).text() + ': ' + newcounter.get('time');
+						$(document.getElementById(url)).text(content);
+					},
+					error: function(newcounter, error) {
+						console.log('Failed to create');
+					}
+				});
+			}
+		},
+		error: function(error) {
+			console.log('Error:' + error.code + " " + error.message);
+		}
+	});
+}
+$(function() {
+	var Counter = AV.Object.extend("Counter");
+	if ($('.leancloud_visitors').length == 1) {
+		addCount(Counter);
+	} else if ($('.post-title-link').length > 1) {
+		showTime(Counter);
+	}
+}); 
+</script>
+
+  
+
+</body>
+</html>

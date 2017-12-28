@@ -1,0 +1,979 @@
+<!doctype html>
+<html class="theme-next   use-motion ">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.4.5.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="WebView,缓存," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.2" />
+
+
+
+
+
+
+<meta name="description" content="自打去年十一来到掘金，就想着有一点一定会做 WebView 离线缓存，作为一个阅读类 app,不敢想象在没有离线缓存的情况下是怎么撑了这么久的😂。在下个版本中就有大家喜闻乐见的文章离线缓存了。
+
+本文只授权掘金。。。
+我还给掘金想了个 slogan : 用掘金的人，技术一定不会太差。
+System.out.println(&amp;quot;Hello World !&amp;quot;);
+1WebView">
+<meta property="og:type" content="article">
+<meta property="og:title" content="WebView 图片离线缓存（含图片）">
+<meta property="og:url" content="http://kingideayou.github.io/2016/06/16/webview_cache_with_image/index.html">
+<meta property="og:site_name" content="NeXT' Note">
+<meta property="og:description" content="自打去年十一来到掘金，就想着有一点一定会做 WebView 离线缓存，作为一个阅读类 app,不敢想象在没有离线缓存的情况下是怎么撑了这么久的😂。在下个版本中就有大家喜闻乐见的文章离线缓存了。
+
+本文只授权掘金。。。
+我还给掘金想了个 slogan : 用掘金的人，技术一定不会太差。
+System.out.println(&amp;quot;Hello World !&amp;quot;);
+1WebView">
+<meta property="og:updated_time" content="2016-07-11T09:56:49.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="WebView 图片离线缓存（含图片）">
+<meta name="twitter:description" content="自打去年十一来到掘金，就想着有一点一定会做 WebView 离线缓存，作为一个阅读类 app,不敢想象在没有离线缓存的情况下是怎么撑了这么久的😂。在下个版本中就有大家喜闻乐见的文章离线缓存了。
+
+本文只授权掘金。。。
+我还给掘金想了个 slogan : 用掘金的人，技术一定不会太差。
+System.out.println(&amp;quot;Hello World !&amp;quot;);
+1WebView">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: '',
+    sidebar: 'post',
+    motion: true
+  };
+</script>
+
+  <title> WebView 图片离线缓存（含图片） | NeXT' Note </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?de80a1008b1f6fb4125cb9f94992261a";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">NeXT' Note</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu ">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            Startseite
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            Archiv
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-th fa-fw"></i> <br />
+            
+            Kategorien
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-user fa-fw"></i> <br />
+            
+            Über
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                WebView 图片离线缓存（含图片）
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            Veröffentlicht am
+            <time itemprop="dateCreated" datetime="2016-06-16T20:10:26+08:00" content="2016-06-16">
+              2016-06-16
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; in
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/WebView/" itemprop="url" rel="index">
+                    <span itemprop="name">WebView</span>
+                  </a>
+                </span>
+
+                
+                
+                  . 
+                
+
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/WebView/缓存/" itemprop="url" rel="index">
+                    <span itemprop="name">缓存</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/06/16/webview_cache_with_image/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/06/16/webview_cache_with_image/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+
+          
+             <span id="/2016/06/16/webview_cache_with_image/"class="leancloud_visitors"  data-flag-title="WebView 图片离线缓存（含图片）">
+                &nbsp; | &nbsp; 阅读次数
+                </span>
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><blockquote class="blockquote-center">自打去年十一来到<a href="http://gold.xitu.io" target="_blank" rel="external">掘金</a>，就想着有一点一定会做 WebView 离线缓存，作为一个阅读类 app,不敢想象在没有离线缓存的情况下是怎么撑了这么久的😂。在下个版本中就有大家喜闻乐见的文章离线缓存了。</blockquote>
+
+<p>本文只授权掘金。。。</p>
+<p>我还给掘金想了个 slogan : 用掘金的人，技术一定不会太差。</p>
+<pre><code>System.out.println(&quot;Hello World !&quot;);
+</code></pre><h3 id="1"><a href="#1" class="headerlink" title="1"></a>1</h3><p>WebView 内容的缓存实际上是把网页的 html、css、js 在本地组合并使用 WebView 的 <a href="https://developer.android.com/reference/android/webkit/WebView.html#loadDataWithBaseURL(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String" target="_blank" rel="external">loadDataWithBaseURL()</a>) 方法来显示缓存的内容</p>
+<p>至于图片的缓存，则需要先将图片下载到本地，然后根据 <code>&lt;img&gt;</code> 标签匹配替换 <code>src</code>，最后达到的效果是 WebView 中所有的内容都是本地内容。</p>
+<h3 id="2"><a href="#2" class="headerlink" title="2"></a>2</h3><p>以知乎日报为例，使用接口获取的 html 内容并未提供网页中图片的 url ，需要使用 JSoup 进行爬取。<a href="https://github.com/cundong/ZhihuPaper" target="_blank" rel="external">cundong/ZhihuPaper</a>  当然如过后台可以提供当前文章的图片 url 列表那是再好不过了。</p>
+<p>这里我们使用了 RxJava 来同时缓存文章和文章中的图片。(感谢 <a href="https://gank.io/post/560e15be2dca930e00da1083" target="_blank" rel="external">给 Android 开发者的 RxJava 详解</a>)</p>
+<pre><code>public class WebHtml {
+    private List&lt;String&gt; imgUrls;
+    private String htmlContent;
+    //get &amp; set ...
+}
+</code></pre><p>首先通过接口获取 WebHtml 数组：</p>
+<pre><code>WebHtml[] webhtmls = ...;
+Subscriber&lt;String&gt; subscriber = new Subscriber&lt;String&gt;() {
+    @Override
+    public void onNext(String imgUrl) {
+         //TODO 下载图片
+        Log.d(tag, &quot;img url : &quot; + imgUrl);
+    }
+    ...
+};
+Observable.from(webhtmls)
+    .flatMap(new Func1&lt;WebHtml, Observable&lt;String&gt;&gt;() {
+        @Override
+        public Observable&lt;String&gt; call(WebHtml webHtml) {
+            return Observable.from(webHtml.getImgUrls());
+        }
+    })
+    .subscribe(subscriber);
+</code></pre><h3 id="3-显示本地缓存的-html-内容"><a href="#3-显示本地缓存的-html-内容" class="headerlink" title="3.显示本地缓存的 html 内容"></a>3.显示本地缓存的 html 内容</h3><ul>
+<li>template.html</li>
+<li>img-replace.js</li>
+<li>img-header.css</li>
+<li>…</li>
+</ul>
+<p>最基本的 html 需要有 <code>&lt;html&gt;&lt;/html&gt;</code> 标签，<code>&lt;head&gt;&lt;/head&gt;</code>标签放置 <code>css</code> 及 <code>js</code> 文件的引用，<code>&lt;body&gt;&lt;/body&gt;</code>标签包裹 html 文本。</p>
+<p>因为我们手机端需要显示的网页比较简单，有了这三项就可以完成页面完整的展示。需要注意的是 <div> 的 id 或者 class 一定要跟 css 的对应，否则找不到对应的 id 则不能得到想要实现的样式。</div></p>
+<h4 id="template-html"><a href="#template-html" class="headerlink" title="template.html:"></a>template.html:</h4><pre><code>&lt;!doctype html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;meta charset=&quot;utf-8&quot;&gt;
+    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width,user-scalable=no&quot;&gt;
+    &lt;link href=&quot;file:///android_asset/www/header-img.css&quot; type=&quot;text/css&quot; rel=&quot;stylesheet&quot;&gt;
+    {juejin-css-js}
+    &lt;script src=&quot;file:///android_asset/www/img_replace.js&quot;&gt;&lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class=&quot;container entry-view&quot;&gt;
+        {juejin-header}
+        &lt;div class=&quot;entry-content&quot;&gt;
+            {juejin-content}
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre><p>细心的同学可能会注意到 html 中有一些比较奇怪的东西：</p>
+<ul>
+<li>{juejin-css-js}</li>
+<li>{juejin-header}</li>
+<li>{juejin-content}</li>
+</ul>
+<p>这三个是作为替换 css、js 或者 html 的 key.</p>
+<p>本地拼接</p>
+<h3 id="详情页图片的替换"><a href="#详情页图片的替换" class="headerlink" title="详情页图片的替换"></a>详情页图片的替换</h3><h4 id="替换时机"><a href="#替换时机" class="headerlink" title="替换时机"></a>替换时机</h4><p>在 WebView 的 <code>onPageFinished()</code> 方法中将下载的图片的本地路径与 html 中 <img> 标签下的 <code>src</code> 替换，WebView 则显示本地图片。</p>
+<h4 id="如何替换"><a href="#如何替换" class="headerlink" title="如何替换"></a>如何替换</h4><p>上面的 html 代码中有一段 <code>&lt;script src=&quot;file:///android_asset/www/img_replace.js&quot;&gt;&lt;/script&gt;</code>，这里就是我们客户端手动添加的替换图片的 js 代码</p>
+<p>Before:</p>
+<pre><code>&lt;img src=&quot;http://ac-mhke0kuv.clouddn.com/46126f3b0e51085f5fc1.jpg&quot;&gt;
+</code></pre><p>After:</p>
+<pre><code>&lt;img src=&quot;/storage/emulated/0/Android/data/packageName/cache/xxxxxx.jpg&quot;&gt;
+</code></pre><p>在 assets/www 目录下 本地创建一个 image_replace.js 来实现详情页图片的替换（网络 url 替换为已下载完成的图片的本地路径），js 代码如下：</p>
+<pre><code>function img_replace_by_url(url, localPath) {
+    var objs = document.getElementsByTagName(&quot;img&quot;);
+    for(var i=0;i&lt;objs.length;i++) {
+        var imgUrl = objs[i].getAttribute(&quot;src&quot;);
+        if (imgUrl == url) {
+            objs[i].setAttribute(&quot;src&quot;, localPath);
+        }
+    }
+}
+</code></pre><p>使用方法也比较简单：</p>
+<pre><code>private void replaceImgUrl(String imgUrl, String localPath) {
+        String javascript;
+        if (headerImageUrl != null &amp;&amp; headerImageUrl.equals(imgUrl)) {
+            return;
+        } else {
+            javascript = &quot;img_replace_by_url(&apos;&quot; + imgUrl + &quot;&apos;, &apos;&quot; + localPath + &quot;&apos;)&quot;;
+        }
+        //替换 html 中的 img 图片为本地资源
+        if(Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.KITKAT) {
+            mWebView.evaluateJavascript(javascript, new ValueCallback&lt;String&gt;(){
+                @Override
+                public void onReceiveValue(String s) {
+                    JsonReader reader = new JsonReader(new StringReader(s));
+                    // Must set lenient to parse single values
+                    reader.setLenient(true);
+                    try {
+                        if(reader.peek() != JsonToken.NULL) {
+                            if(reader.peek() == JsonToken.STRING) {
+                                String msg = reader.nextString();
+                                if(msg != null) {
+                                    Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show();
+                                }
+                            }
+                        }
+                    } catch (IOException e) {
+                        Log.e(&quot;TAG&quot;, &quot;MainActivity: IOException&quot;, e);
+                    } finally {
+                        try {
+                            reader.close();
+                        } catch (IOException e) {
+                            // NOOP
+                        }
+                    }
+                }
+            });
+        } else {
+            mWebView.loadUrl(&quot;javascript:&quot; + javascript);
+        }
+    }
+</code></pre><p>关于 evaluateJavascript：从 Android 4.4 起，WebView 使用 Chromium 内核，evaluateJavascript 方法可以异步获取 js 的回调。  </p>
+<p>更多关于 evaluateJavascript: <a href="http://stackoverflow.com/questions/19788294/how-does-evaluatejavascript-work" target="_blank" rel="external">How does evaluateJavascript work?</a></p>
+<h3 id="关于-loadDataWithBaseURL"><a href="#关于-loadDataWithBaseURL" class="headerlink" title="关于 loadDataWithBaseURL"></a>关于 loadDataWithBaseURL</h3><pre><code>loadDataWithBaseURL (String baseUrl, String data, String mimeType, String encoding, String historyUrl) 这里的 `baseUrl` 就是一个标志位，用来标志当前页面的Key值的，而historyUrl就是一个value值，在加载时，它会把baseUrl和historyUrl传到List列表中，当作历史记录来使用，当前进和后退时，它会通过baseUrl来寻找historyUrl的路径来加载historyUrl路径来加载历史界面
+</code></pre><p>详见：<a href="http://hilary3113.iteye.com/blog/1135185" target="_blank" rel="external">loadData与loadDataWithBaseURL的区别</a></p>
+<p>这里有个问题，就是在使用 <code>loadUrl()</code> 方法加载网页时，用户点击返回按钮，我们可以根据 <code>WebView.canGoBack()</code> 来判断当前 WebView 的浏览历史用是否有其他记录  </p>
+<pre><code>@Override
+public boolean onKeyDown(int keyCode, KeyEvent event) {
+    if (event.getAction() == KeyEvent.ACTION_DOWN) {
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_BACK:
+                if (mWebView.canGoBack()) {
+                    mWebView.goBack();
+                } else {
+                    finish();
+                }
+                return true;
+        }
+    }
+    return super.onKeyDown(keyCode, event);
+}
+</code></pre><p>比如我们使用 WebView 打开 a 页面，在 a 页面中点看链接进入到 b 页面，那么我们在 b 页面点击返回按钮时，<code>WebView.canGoBack()</code> 会返回一个 true ，说明 WebView 的浏览历史中有其他页面，然后调用 <code>WebView.goBack()</code> 时系统会调用 <code>WebView.loadUrl()</code> 方法回到 a 页面。  </p>
+<p>这里有个问题就是，当我们使用 <code>loadDataWithBaseURL()</code> 方法传入 baseUrl 时，在上个例子中的 a 页面的路径即为我们传入的 baseUrl ，但是本地并没有一个 html 文件对应文件，所以当我们调用 <code>WebView.goBack()</code> 加载这个 url 时，会提示找不到当前的 baseUrl。  </p>
+<p>我们目前使用的解决方案是自己维护一个 WebView 加载 url 的列表，当列表中的 url 数量为 1 时，则手动调用 <code>loadDataWithBaseURL()</code> 来加载内容。 </p>
+<h3 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h3><p>自动清理缓存<br>加载速度优化：<a href="http://stackoverflow.com/questions/7422427/android-webview-slow" target="_blank" rel="external">Android webview slow</a>（关于加载速度的优化，我们在网上找了好多解决方案，效果都不理想，最后发现是因为我们的 js 文件太大…）</p>
+<h3 id="Dependencies"><a href="#Dependencies" class="headerlink" title="Dependencies"></a>Dependencies</h3><p><a href="">RxJava</a><br><a href="">OkHttp</a>  </p>
+<h3 id="Thanks-to"><a href="#Thanks-to" class="headerlink" title="Thanks to"></a>Thanks to</h3><p>新奇日报：<a href="https://github.com/cundong/ZhihuPaper" target="_blank" rel="external">cundong/ZhihuPaper</a><br>扔物线：<a href="https://gank.io/post/560e15be2dca930e00da1083" target="_blank" rel="external">给 Android 开发者的 RxJava 详解</a>  </p>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/WebView/" rel="tag">#WebView</a>
+          
+            <a href="/tags/缓存/" rel="tag">#缓存</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/05/13/edit_text_plus_library/" rel="next" title="简单的开源库 EditTextPlus">
+                <i class="fa fa-chevron-left"></i> 简单的开源库 EditTextPlus
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/09/20/android_memory_leaks_inputmethodManager_solved/" rel="prev" title="Android InputMethodManager 导致的内存泄漏">
+                Android InputMethodManager 导致的内存泄漏 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <div class="ds-share flat" data-thread-key="2016/06/16/webview_cache_with_image/"
+     data-title="WebView 图片离线缓存（含图片）"
+     data-content=""
+     data-url="http://kingideayou.github.io/2016/06/16/webview_cache_with_image/">
+  <div class="ds-share-inline">
+    <ul  class="ds-share-icons-16">
+
+      <li data-toggle="ds-share-icons-more"><a class="ds-more" href="javascript:void(0);">分享到：</a></li>
+      <li><a class="ds-weibo" href="javascript:void(0);" data-service="weibo">微博</a></li>
+      <li><a class="ds-qzone" href="javascript:void(0);" data-service="qzone">QQ空间</a></li>
+      <li><a class="ds-qqt" href="javascript:void(0);" data-service="qqt">腾讯微博</a></li>
+      <li><a class="ds-wechat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+
+    </ul>
+    <div class="ds-share-icons-more">
+    </div>
+  </div>
+</div>
+      
+    </div>
+  </div>
+
+
+        </div>
+
+        
+
+
+        
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2016/06/16/webview_cache_with_image/"
+           data-title="WebView 图片离线缓存（含图片）" data-url="http://kingideayou.github.io/2016/06/16/webview_cache_with_image/">
+      </div>
+    
+  </div>
+
+
+      </div>
+
+      
+        
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Inhaltsverzeichnis
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Übersicht
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="/images/default_avatar.jpg" alt="NeXT" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">NeXT</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description"></p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">23</span>
+              <span class="site-state-item-name">Artikel</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">29</span>
+              <span class="site-state-item-name">Kategorien</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">30</span>
+              <span class="site-state-item-name">Tags</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1"><span class="nav-number">1.</span> <span class="nav-text">1</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2"><span class="nav-number">2.</span> <span class="nav-text">2</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-显示本地缓存的-html-内容"><span class="nav-number">3.</span> <span class="nav-text">3.显示本地缓存的 html 内容</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#template-html"><span class="nav-number">3.1.</span> <span class="nav-text">template.html:</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#详情页图片的替换"><span class="nav-number">4.</span> <span class="nav-text">详情页图片的替换</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#替换时机"><span class="nav-number">4.1.</span> <span class="nav-text">替换时机</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#如何替换"><span class="nav-number">4.2.</span> <span class="nav-text">如何替换</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#关于-loadDataWithBaseURL"><span class="nav-number">5.</span> <span class="nav-text">关于 loadDataWithBaseURL</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#最后"><span class="nav-number">6.</span> <span class="nav-text">最后</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Dependencies"><span class="nav-number">7.</span> <span class="nav-text">Dependencies</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Thanks-to"><span class="nav-number">8.</span> <span class="nav-text">Thanks to</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+      
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">NeXT</span>
+</div>
+
+<div class="powered-by">
+  Erstellt mit  <a class="theme-link" href="http://hexo.io">Hexo</a>
+</div>
+
+<div class="theme-info">
+  Theme -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT
+  </a>
+</div>
+
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+    
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"nblog"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+    
+     
+
+
+    
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.2"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.2"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+<script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+<script type="text/javascript" src="/js/motion.js?v=0.4.5.2" id="motion.global"></script>
+
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.2" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    motionMiddleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+      if (CONFIG.sidebar === 'post') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  <script type="text/javascript" src="/js/bootstrap.js"></script>
+
+  
+  
+
+  
+  
+
+  
+     <!-- custom analytics part create by xiamo -->
+<script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+<script>AV.initialize("Bfw8DjNmL4FLoxqoz3vUlLGd-gzGzoHsz", "33hHJV3K3Am3vhOw5AghkoOG");</script>
+<script>
+function showTime(Counter) {
+	var query = new AV.Query(Counter);
+	$(".leancloud_visitors").each(function() {
+		var url = $(this).attr("id").trim();
+		query.equalTo("url", url);
+		query.find({
+			success: function(results) {
+				if (results.length == 0) {
+					var content = $(document.getElementById(url)).text() + ': 0';
+					$(document.getElementById(url)).text(content);
+					return;
+				}
+				for (var i = 0; i < results.length; i++) {
+					var object = results[i];
+					var content = $(document.getElementById(url)).text() + ': ' + object.get('time');
+					$(document.getElementById(url)).text(content);
+				}
+			},
+			error: function(object, error) {
+				console.log("Error: " + error.code + " " + error.message);
+			}
+		});
+
+	});
+}
+
+function addCount(Counter) {
+	var Counter = AV.Object.extend("Counter");
+	url = $(".leancloud_visitors").attr('id').trim();
+	title = $(".leancloud_visitors").attr('data-flag-title').trim();
+	var query = new AV.Query(Counter);
+	query.equalTo("url", url);
+	query.find({
+		success: function(results) {
+			if (results.length > 0) {
+				var counter = results[0];
+				counter.fetchWhenSave(true);
+				counter.increment("time");
+				counter.save(null, {
+					success: function(counter) {
+						var content = $(document.getElementById(url)).text() + ': ' + counter.get('time');
+						$(document.getElementById(url)).text(content);
+					},
+					error: function(counter, error) {
+						console.log('Failed to save Visitor num, with error message: ' + error.message);
+					}
+				});
+			} else {
+				var newcounter = new Counter();
+				newcounter.set("title", title);
+				newcounter.set("url", url);
+				newcounter.set("time", 1);
+				newcounter.save(null, {
+					success: function(newcounter) {
+					    console.log("newcounter.get('time')="+newcounter.get('time'));
+						var content = $(document.getElementById(url)).text() + ': ' + newcounter.get('time');
+						$(document.getElementById(url)).text(content);
+					},
+					error: function(newcounter, error) {
+						console.log('Failed to create');
+					}
+				});
+			}
+		},
+		error: function(error) {
+			console.log('Error:' + error.code + " " + error.message);
+		}
+	});
+}
+$(function() {
+	var Counter = AV.Object.extend("Counter");
+	if ($('.leancloud_visitors').length == 1) {
+		addCount(Counter);
+	} else if ($('.post-title-link').length > 1) {
+		showTime(Counter);
+	}
+}); 
+</script>
+
+  
+
+</body>
+</html>
